@@ -1,5 +1,8 @@
-const message: string = 'toolchain works'
-const nums: number[] = [1, 2, 3]
+import { pool } from './config/db.js'
+import { env } from './config/env.js'
 
-const first: number | undefined = nums[0]
-console.log(message, first)
+const [rows] = await pool.query('SELECT 1 AS ok')
+console.log('DB reachable:', rows)
+console.log(`Listening on http://localhost:${env.PORT}`)
+
+await pool.end()   // close cleanly instead of hanging the process
