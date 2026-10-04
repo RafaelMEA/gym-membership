@@ -11,4 +11,5 @@ export const pool = mysql.createPool({
   waitForConnections: true,   // queue instead of throwing when full
   enableKeepAlive: true,      // detect dead connections
   timezone: 'Z',              // see the date section below
+  dateStrings: true,   // ← add: DATE/DATETIME as 'YYYY-MM-DD', not Date objects
 })
