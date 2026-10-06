@@ -1,4 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
+import { ZodError } from 'zod'
 
 // An error we EXPECTED (404, 409, 403...) — safe to show the client
 export class AppError extends Error {
@@ -31,7 +32,19 @@ export function errorHandler(
     })
     return
   }
-  console.error('Unhandled error:', err)  
+
+  if (err instanceof ZodError) {
+    res.status(400).json({
+      error: {
+        code: 'VALIDATION_ERROR',
+        message: err.issues[0]?.message ?? 'Invalid input',
+        details: err.issues.map(i => ({ path: i.path.join('.'), message: i.message })),
+      },
+    })
+    return
+  }
+
+  console.error('Unhandled error:', err)
   res.status(500).json({
     error: { code: 'INTERNAL_ERROR', message: 'Something went wrong' },
   })
