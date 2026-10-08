@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import { listMembers, createMember } from './member.service.js'
+import { listMembers, createMember, getMemberById, updateMember, removeMember } from './member.service.js'
 
 export async function findAll(_req: Request, res: Response, next: NextFunction) {
   try {
@@ -21,15 +21,45 @@ export async function create(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export async function findById(_req: Request, res: Response, _next: NextFunction) {
-  res.status(501).json({ error: { code: 'NOT_IMPLEMENTED', message: 'findById', details: [] } })
+export async function findById(req: Request, res: Response, next: NextFunction) {
+  const id = Number(req.params.id)
+  if (!Number.isInteger(id) || id <= 0) {
+    res.status(400).json({ error: { code: 'INVALID_ID', message: 'Invalid member ID', details: [] } })
+    return
+  }
+  try {
+    const member = await getMemberById(id)
+    res.json({ data: member })
+  } catch (err) {
+    next(err)
+  }
 }
 
-export async function update(_req: Request, res: Response, _next: NextFunction) {
-  res.status(501).json({ error: { code: 'NOT_IMPLEMENTED', message: 'update', details: [] } })
+export async function update(req: Request, res: Response, next: NextFunction) {
+  const id = Number(req.params.id)
+  if (!Number.isInteger(id) || id <= 0) {
+    res.status(400).json({ error: { code: 'INVALID_ID', message: 'Invalid member ID', details: [] } })
+    return
+  }
+  try {
+    const member = await updateMember(id, req.body)
+    res.json({ data: member })
+  } catch (err) {
+    next(err)
+  }
 }
 
-export async function remove(_req: Request, res: Response, _next: NextFunction) {
-  res.status(501).json({ error: { code: 'NOT_IMPLEMENTED', message: 'remove', details: [] } })
+export async function remove(req: Request, res: Response, next: NextFunction) {
+  const id = Number(req.params.id)
+  if (!Number.isInteger(id) || id <= 0) {
+    res.status(400).json({ error: { code: 'INVALID_ID', message: 'Invalid member ID', details: [] } })
+    return
+  }
+  try {
+    await removeMember(id)
+    res.status(204).end()
+  } catch (err) {
+    next(err)
+  }
 }
 

@@ -8,3 +8,8 @@ export const createMemberSchema = z.object({
   phone:  z.union([z.string().max(30), z.literal(''), z.null()]),
   gender: z.enum(['male', 'female', 'other', 'undisclosed']).default('undisclosed'),
 })
+
+export const updateMemberSchema = createMemberSchema.partial().refine(
+  (data) => Object.keys(data).length > 0,
+  { message: 'At least one field must be provided for update' }
+)
