@@ -8,8 +8,12 @@ const schema = z.object({
   DB_HOST:     z.string().min(1),
   DB_PORT:     z.coerce.number().int().default(3306),
   DB_USER:     z.string().min(1),
-  DB_PASSWORD: z.string().default(''),   // XAMPP root has no password
+  DB_PASSWORD: z.string().default(''),
   DB_NAME:     z.string().min(1).default('gym_membership'),
+
+  // JWT
+  JWT_SECRET:     z.string().min(16, 'JWT_SECRET must be at least 16 chars'),
+  JWT_EXPIRES_IN: z.string().default('1h'),
 })
 
 const parsed = schema.safeParse(process.env)
