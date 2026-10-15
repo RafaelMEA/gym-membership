@@ -25,7 +25,10 @@ export async function updateMember(id: number, data: Partial<UpdateMemberData>):
   return member
 }
   
-export async function removeMember(id: number): Promise<void> {
+export async function removeMember(id: number, actor: { role: string }) {
+  if (actor.role !== 'admin') {
+    throw new AppError(403, 'FORBIDDEN', 'Only admins may delete members')
+  }
   const affected = await remove(id)
   if (affected === 0) throw new AppError(404, 'NOT_FOUND', 'Member not found')
 }

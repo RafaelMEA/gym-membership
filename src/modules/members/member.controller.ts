@@ -56,7 +56,8 @@ export async function remove(req: Request, res: Response, next: NextFunction) {
     return
   }
   try {
-    await removeMember(id)
+    const actor = res.locals.staff
+    await removeMember(id, actor)
     res.status(204).end()
   } catch (err) {
     next(err)
