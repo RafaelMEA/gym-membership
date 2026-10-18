@@ -1,6 +1,6 @@
 import { AppError } from '../../middleware/error.js'
-import {findAll, findByEmail, create, MemberRow, findById, UpdateMemberData, remove, update} from './member.repository.js'
-import { createMemberSchema } from './member.schema.js'
+import {findAll, findByEmail, create, MemberRow, findById, remove, update} from './member.repository.js'
+import { createMemberSchema, updateMemberSchema } from './member.schema.js'
 
 export const listMembers = () => findAll()
 
@@ -19,10 +19,22 @@ export async function getMemberById(id: number): Promise<MemberRow> {
   return member
 }
 
-export async function updateMember(id: number, data: Partial<UpdateMemberData>): Promise<MemberRow> {
-  const member = await update(id, data) 
+export async function updateMember(id: number, data: unknown): Promise<MemberRow> {
+  const parsed = updateMemberSchema.parse(data)
+
+  const member = await findById(id)
   if (!member) throw new AppError(404, 'NOT_FOUND', 'Member not found')
-  return member
+
+  if (parsed.email && parsed.email !== member.email) {
+    const existing = await findByEmail(parsed.email)
+    if (existing.length > 0) {
+      throw new AppError(409, 'EMAIL_TAKEN', 'That email is already registered')
+    }
+  }
+
+  const updated = await update(id, parsed)
+  if (!updated) throw new AppError(404, 'NOT_FOUND', 'Member not found')
+  return updated
 }
   
 export async function removeMember(id: number, actor: { role: string }) {
