@@ -1,6 +1,7 @@
 import express from 'express';
 import { env } from './config/env.js';
 import { memberRouter } from './modules/members/member.routes.js';
+import { planRouter } from './modules/plans/plans.routes.js';
 import { notFoundHandler, errorHandler } from './middleware/error.js';
 
 import cookieParser from 'cookie-parser';
@@ -18,5 +19,6 @@ app.get('/health', (_req, res) => {
 app.use(cookieParser());
 app.use('/api/auth', authRouter);
 app.use('/api/members', memberRouter);
+app.use('/api/plans', planRouter)
 app.use(notFoundHandler);
 app.use(errorHandler);

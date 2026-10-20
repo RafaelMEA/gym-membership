@@ -32,14 +32,14 @@ export interface UpdatePlanData extends Partial<CreatePlanData> {
 
 export async function findAll(): Promise<PlanRow[]> {
   const [rows] = await pool.execute(
-    "SELECT id, name, description, price, duration_value, duration_unit, max_visits_per_period, is_active FROM plans WHERE is_active = 1",
+    "SELECT id, name, description, price, duration_value, duration_unit, max_visits_per_period, is_active FROM membership_plans WHERE is_active = 1",
   );
   return rows as PlanRow[];
 }
 
 export async function findById(id: number): Promise<PlanRow | null> {
   const [rows] = await pool.execute(
-    "SELECT id, name, description, price, duration_value, duration_unit, max_visits_per_period, is_active FROM plans WHERE id = ? AND is_active = 1",
+    "SELECT id, name, description, price, duration_value, duration_unit, max_visits_per_period, is_active FROM membership_plans WHERE id = ? AND is_active = 1",
     [id],
   );
   const plan = (rows as PlanRow[])[0];
@@ -48,7 +48,7 @@ export async function findById(id: number): Promise<PlanRow | null> {
 
 export async function findByName(name: string): Promise<PlanRow | null> {
   const [rows] = await pool.execute(
-    "SELECT id, name, description, price, duration_value, duration_unit, max_visits_per_period, is_active FROM plans WHERE name = ?",
+    "SELECT id, name, description, price, duration_value, duration_unit, max_visits_per_period, is_active FROM membership_plans WHERE name = ?",
     [name],
   );
   const plan = (rows as PlanRow[])[0];
@@ -57,7 +57,7 @@ export async function findByName(name: string): Promise<PlanRow | null> {
 
 export async function create(data: CreatePlanData): Promise<PlanRow> {
   const [result] = await pool.execute(
-    "INSERT INTO plans (name, description, price, duration_value, duration_unit, max_visits_per_period) VALUES (?, ?, ?, ?, ?, ?)",
+    "INSERT INTO membership_plans (name, description, price, duration_value, duration_unit, max_visits_per_period) VALUES (?, ?, ?, ?, ?, ?)",
     [
       data.name,
       data.description ?? null,
@@ -71,7 +71,7 @@ export async function create(data: CreatePlanData): Promise<PlanRow> {
 
   const [rows] = await pool.execute(
     `SELECT id, name, description, price, duration_value, duration_unit, max_visits_per_period
-       FROM members WHERE id = ?`,
+       FROM membership_plans WHERE id = ?`,
     [insertId],
   );
   return (rows as PlanRow[])[0]!;
@@ -92,17 +92,21 @@ export async function update(
   data: Partial<UpdatePlanData>,
 ): Promise<PlanRow | null> {
   const fields = Object.keys(data).filter((f) => ALLOWED_FIELDS.includes(f));
+  if (fields.length === 0) return findById(id)
 
   const setClause = fields.map((f) => `${f} = ?`).join(", ");
   const values = fields.map((f) => data[f as keyof UpdatePlanData] ?? null);
 
-  await pool.execute(`UPDATE members SET ${setClause} WHERE id = ?`, [
+  await pool.execute(`UPDATE membership_plans SET ${setClause} WHERE id = ?`, [
     ...values,
     id,
   ]);
   return findById(id);
 }
 
-export async function remove(id: number): Promise<void> {
-  await pool.execute("UPDATE plans SET is_active = 0 WHERE id = ?", [id]);
+export async function remove(id: number): Promise<number> {
+  const [result] = await pool.execute("UPDATE membership_plans SET is_active = 0 WHERE id = ? AND is_active = 1", [id],
+  )
+
+  return (result as ResultSetHeader).affectedRows
 }

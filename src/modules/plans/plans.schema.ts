@@ -1,19 +1,27 @@
 import { z } from "zod";
 
-export const createPlanSchema = z.object({
-  name:        z.string().trim().min(2).max(80),
-  description: z.string().trim().max(255).nullable().optional(),
-  price:       z.coerce.number().nonnegative(),
-  duration_value: z.number().int().positive().default(1),
-  duration_unit:  z.enum(['day', 'week', 'month', 'year']).default('month'),
-  max_visits_per_period: z.number().int().positive().nullable().optional(),
-})
+const durationUnit = z.enum(["day", "week", "month", "year"]);
 
-export const updatePlanSchema = z.object({
-    name:        z.string().trim().min(2).max(80).optional(),
-    description: z.string().trim().max(255).nullable().optional(),
-    price:       z.coerce.number().nonnegative().optional(),
-    duration_value: z.number().int().positive().optional(),
-    duration_unit:  z.enum(['day', 'week', 'month', 'year']).optional(),
-    max_visits_per_period: z.number().int().positive().nullable().optional(),
-})
+const planFields = {
+  name: z.string().trim().min(2).max(80),
+  description: z.string().trim().max(255).nullable(),
+  price: z.coerce.number().nonnegative(),
+  duration_value: z.number().int().positive(),
+  duration_unit: durationUnit,
+  max_visits_per_period: z.number().int().positive().nullable(),
+};
+
+export const createPlanSchema = z.object({
+  ...planFields,
+  description: planFields.description.optional(),
+  max_visits_per_period: planFields.max_visits_per_period.optional(),
+  duration_value: planFields.duration_value.default(1),
+  duration_unit: planFields.duration_unit.default("month"),
+});
+
+export const updatePlanSchema = z
+  .object(planFields)
+  .partial()
+  .refine((data) => Object.keys(data).length > 0, {
+    message: "At least one field must be provided for update",
+  });
