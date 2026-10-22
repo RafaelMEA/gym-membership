@@ -101,6 +101,9 @@ CREATE TABLE subscriptions (
                       NOT NULL DEFAULT 'active',
   cancelled_at        DATETIME NULL,
   cancellation_reason VARCHAR(255) NULL,
+  -- When the freeze STARTED. Needed to know how long to push
+  -- end_date back on unfreeze — frozen_until alone can't say that.
+  frozen_at           DATETIME NULL,
   frozen_until        DATE NULL,
   auto_renew          TINYINT(1) NOT NULL DEFAULT 0,
   created_at          DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -176,6 +179,15 @@ CREATE TABLE attendance (
   KEY idx_att_member_in (member_id, check_in),
   CHECK (check_out IS NULL OR check_out >= check_in)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ─────────────────────────────────────────────────────────────
+-- MIGRATIONS (applied to an existing database)
+-- ─────────────────────────────────────────────────────────────
+-- 001_add_frozen_at.sql
+--   Why: end_date must be pushed back by the frozen duration when
+--   a subscription is unfrozen. frozen_until tells us WHEN the
+--   freeze ends, but not WHEN it started — without frozen_at we
+--   cannot compute how many days to add back.
 
 -- ─────────────────────────────────────────────────────────────
 -- VIEW: the single source of truth for "is this member active?"
