@@ -3,6 +3,7 @@ import { env } from './config/env.js';
 import { memberRouter } from './modules/members/member.routes.js';
 import { planRouter } from './modules/plans/plans.routes.js';
 import { subscriptionRouter } from './modules/subscriptions/subscriptions.routes.js'
+import { paymentRouter } from './modules/payments/payments.routes.js'
 import { notFoundHandler, errorHandler } from './middleware/error.js';
 
 import cookieParser from 'cookie-parser';
@@ -22,5 +23,6 @@ app.use('/api/auth', authRouter);
 app.use('/api/members', memberRouter);
 app.use('/api/plans', planRouter)
 app.use('/api/subscriptions', subscriptionRouter)
+app.use('/api/payments', paymentRouter)
 app.use(notFoundHandler);
 app.use(errorHandler);
