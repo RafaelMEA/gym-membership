@@ -1,0 +1,54 @@
+{
+    "logo": [
+        {
+            "id": 1,
+            "picture_name": "logo.jpeg"
+        }
+    ],
+
+    "map_and_direction_to_gym": [
+        {
+            "id": 1,
+            "picture_name": "map_and_direction_to_gym.jpg"
+        },
+        {
+            "id": 2,
+            "picture_name": "map_and_direction_to_gym_2.jpg"
+        }
+    ],
+
+    "gym_promo's": [
+        {
+            "id": 1,
+            "picture_name": "promo_2.jpg",
+            "description": 
+            "Armstrong Gym/n Gen Luna Branch/n As low as ₱50 per session/n Budget Friendly/n ₱450 per month for students and ₱550 for regular members"
+        },
+
+        {
+            "id": 2,
+            "picture_name": "promo_2026.jpg",
+            "description": 
+            "Standard Package only/n Long Term Promo/n Promo available until december 31, 2026/n Long Term 2 months students = ₱760 and regular = ₱960/n Long Term 3 months students = ₱1,100 and regular = ₱1,350/n Long Term 6 months students = ₱2,100 and regular = ₱2,500/n Long Term 1 year students = ₱3,900 and regular = ₱4,900"
+        }
+    ],
+
+    "inside_gym_pictures": [
+        {
+            "id": 1,
+            "picture_name": "pic_1.jpg",
+            "description": "Inside the gym, showing the equipment and workout area."
+        },
+        {
+            "id": 2,
+            "picture_name": "pic_2.jpg",
+            "description": "Inside the gym, showing the equipment and workout area."
+        },
+        {
+            "id": 3,
+            "picture_name": "pic_3.jpg",
+            "description": "Inside the gym, showing the equipment and workout area."
+        }
+    ]
+
+}
