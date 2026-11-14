@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> · ARMZTRONG GYM</title>
+  <link rel="icon" type="image/jpeg" href="/assets/logo.jpeg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/app.css">
+</head>
+<body class="min-h-screen bg-ink font-sans text-zinc-200 antialiased">
+  <div class="grid min-h-screen lg:grid-cols-2">
+
+    <!-- Photo side — the gym itself sells the place -->
+    <div class="relative hidden lg:block">
+      <img src="/assets/pic1.jpg" alt="Inside ARMZTRONG GYM — equipment and workout area"
+           class="absolute inset-0 h-full w-full object-cover">
+      <div class="absolute inset-0 bg-gradient-to-t from-ink via-ink/70 to-ink/20"></div>
+
+      <div class="relative flex h-full flex-col justify-between p-10">
+        <div class="flex items-center gap-3">
+          <img src="/assets/logo.jpeg" alt="ARMZTRONG GYM logo" class="h-12 w-12 rounded-xl object-cover ring-1 ring-white/15">
+          <div class="leading-tight">
+            <p class="font-display text-2xl tracking-wide text-white">ARMZTRONG <span class="text-brand-500">GYM</span></p>
+            <p class="text-xs text-zinc-400">General Luna Branch</p>
+          </div>
+        </div>
+
+        <div>
+          <h2 class="font-display text-5xl leading-[1.05] text-white">TRAIN HARD.<br><span class="text-brand-500">STAY CONSISTENT.</span></h2>
+          <p class="mt-4 max-w-md text-sm text-zinc-300">
+            As low as ₱50 per session · ₱450 per month for students · ₱550 for regular members.
+          </p>
+          <p class="mt-2 max-w-md text-xs text-zinc-500">Lower General Luna Road (below Mang Inasal)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form side -->
+    <div class="flex items-center justify-center p-6 sm:p-10">
+      <div class="w-full max-w-sm">
+        <!-- Mobile brand (photo side is hidden on small screens) -->
+        <div class="mb-10 flex items-center gap-3 lg:hidden">
+          <img src="/assets/logo.jpeg" alt="ARMZTRONG GYM logo" class="h-10 w-10 rounded-lg object-cover ring-1 ring-line">
+          <p class="font-display text-xl tracking-wide text-white">ARMZTRONG <span class="text-brand-500">GYM</span></p>
+        </div>
+
+        <h1 class="font-display text-3xl text-white">Staff sign in</h1>
+        <p class="mt-1 text-sm text-zinc-500">Use your staff account to manage the gym.</p>
+
+        <% if (error) { %>
+          <div class="mt-5 rounded-lg border border-brand-700/50 bg-brand-600/10 px-4 py-3 text-sm text-brand-400" role="alert">
+            Invalid email or password.
+          </div>
+        <% } %>
+
+        <form method="post" action="/login" class="mt-6 space-y-4">
+          <div>
+            <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Email</label>
+            <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com"
+                   class="mt-1.5 w-full rounded-lg border border-line bg-panel px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-600/30">
+          </div>
+
+          <div>
+            <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Password</label>
+            <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••"
+                   class="mt-1.5 w-full rounded-lg border border-line bg-panel px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-600/30">
+          </div>
+
+          <button type="submit"
+                  class="w-full rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-600/50">
+            Sign in
+          </button>
+        </form>
+
+        <p class="mt-6 text-[11px] leading-relaxed text-zinc-600">
+          Memberships, payments and attendance — managed in one place.
+        </p>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>

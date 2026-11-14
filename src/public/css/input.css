@@ -1,0 +1,37 @@
+/* ============================================================
+   ARMZTRONG GYM — design tokens
+   Brand identity comes from the logo + posters:
+   pure red on near-black, white type, condensed headings.
+   ============================================================ */
+@import "tailwindcss";
+
+@theme {
+  /* Headings: condensed, poster-style (falls back gracefully offline) */
+  --font-display: "Barlow Condensed", "Arial Narrow", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+
+  /* Brand red — sampled from the promo posters */
+  --color-brand-400: #f87171;
+  --color-brand-500: #ef4444;
+  --color-brand-600: #dc2626;
+  --color-brand-700: #b91c1c;
+
+  /* Surfaces: near-black ink, slightly lifted panels, hairline borders */
+  --color-ink: #0a0a0c;
+  --color-panel: #121216;
+  --color-panel-2: #17171c;
+  --color-line: #26262c;
+}
+
+/* Base polish */
+@layer base {
+  html {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-ink text-zinc-200 antialiased;
+  }
+  ::selection {
+    @apply bg-brand-600/40 text-white;
+  }
+}

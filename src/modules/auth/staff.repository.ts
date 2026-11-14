@@ -18,6 +18,14 @@ export async function findByEmail(email: string): Promise<StaffRow | null> {
   return (rows as StaffRow[])[0] ?? null
 }
 
+export async function findById(id: number): Promise<StaffRow | null> {
+  const [rows] = await pool.execute(
+    'SELECT id, full_name, email, password_hash, role, is_active FROM auth_staff WHERE id = ?',
+    [id],
+  )
+  return (rows as StaffRow[])[0] ?? null
+}
+
 export async function create(data: {
   full_name: string
   email: string

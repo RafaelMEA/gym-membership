@@ -1,0 +1,86 @@
+<%
+  // Sidebar navigation. `activeNav` marks the current page; modules
+  // without pages yet render dimmed with a SOON badge instead of
+  // linking to a 404.
+  const nav = [
+    { label: 'Dashboard', key: 'dashboard', href: '/' },
+    { label: 'Members', key: 'members', soon: true },
+    { label: 'Plans', key: 'plans', soon: true },
+    { label: 'Subscriptions', key: 'subscriptions', soon: true },
+    { label: 'Payments', key: 'payments', soon: true },
+    { label: 'Attendance', key: 'attendance', soon: true },
+  ]
+
+  const icons = {
+    dashboard: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+    members: '<circle cx="12" cy="7.5" r="3.5"/><path d="M4.5 20.5c0-4.1 3.4-7 7.5-7s7.5 2.9 7.5 7"/>',
+    plans: '<path d="M3 11V4a1 1 0 0 1 1-1h7l10 10-8 8L3 11z"/><circle cx="7.5" cy="7.5" r="1.5"/>',
+    subscriptions: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/>',
+    payments: '<rect x="2.5" y="5" width="19" height="14" rx="2"/><path d="M2.5 10h19"/>',
+    attendance: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+    logout: '<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="M16 17l5-5-5-5M21 12H9"/>',
+  }
+
+  const initials = (typeof staff !== 'undefined' && staff)
+    ? staff.full_name.split(' ').filter(Boolean).map((p) => p[0]).slice(0, 2).join('').toUpperCase()
+    : '?'
+%>
+
+<aside class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-panel md:flex">
+  <!-- Brand -->
+  <div class="flex h-16 items-center gap-3 border-b border-line px-5">
+    <img src="/assets/logo.jpeg" alt="ARMZTRONG GYM logo" class="h-10 w-10 rounded-lg object-cover ring-1 ring-line">
+    <div class="leading-tight">
+      <p class="font-display text-xl tracking-wide text-white">ARMZTRONG <span class="text-brand-500">GYM</span></p>
+      <p class="text-[11px] text-zinc-500">General Luna Branch</p>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <nav class="flex-1 space-y-1 px-3 py-4">
+    <% nav.forEach((item) => { %>
+      <% if (item.soon) { %>
+        <span title="Coming soon"
+              class="flex cursor-not-allowed select-none items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-zinc-700"><%- icons[item.key] %></svg>
+          <span class="flex-1"><%= item.label %></span>
+          <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-zinc-500">SOON</span>
+        </span>
+      <% } else { %>
+        <a href="<%= item.href %>"
+           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+                  <%= item.key === activeNav
+                        ? 'bg-brand-600/15 text-white ring-1 ring-brand-600/40'
+                        : 'text-zinc-400 hover:bg-panel-2 hover:text-zinc-200' %>">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
+               class="h-5 w-5 <%= item.key === activeNav ? 'text-brand-500' : 'text-zinc-500' %>"><%- icons[item.key] %></svg>
+          <span><%= item.label %></span>
+        </a>
+      <% } %>
+    <% }) %>
+  </nav>
+
+  <!-- User + logout -->
+  <div class="border-t border-line p-3">
+    <div class="flex items-center gap-3 rounded-lg px-2 py-2">
+      <span class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600/20 text-sm font-semibold text-brand-400 ring-1 ring-brand-600/40"><%= initials %></span>
+      <div class="min-w-0 flex-1">
+        <p class="truncate text-sm font-medium text-zinc-200"><%= staff ? staff.full_name : '' %></p>
+        <p class="text-[11px] uppercase tracking-wider text-zinc-500"><%= staff ? staff.role : '' %></p>
+      </div>
+    </div>
+    <form method="post" action="/logout">
+      <button type="submit"
+              class="mt-1 flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:bg-panel-2 hover:text-brand-400">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-zinc-500"><%- icons.logout %></svg>
+        Sign out
+      </button>
+    </form>
+  </div>
+</aside>
+
+<!-- Mobile top bar (sidebar is desktop-only for now) -->
+<div class="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-line bg-panel/95 px-4 backdrop-blur md:hidden">
+  <img src="/assets/logo.jpeg" alt="ARMZTRONG GYM logo" class="h-8 w-8 rounded-md object-cover ring-1 ring-line">
+  <p class="font-display text-lg tracking-wide text-white">ARMZTRONG <span class="text-brand-500">GYM</span></p>
+</div>
