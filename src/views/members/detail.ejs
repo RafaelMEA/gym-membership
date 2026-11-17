@@ -1,0 +1,206 @@
+<a href="/members" class="inline-flex items-center gap-1.5 text-xs text-zinc-500 transition-colors hover:text-zinc-300">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5"><path d="M15 18l-6-6 6-6"/></svg>
+  All members
+</a>
+
+<!-- Hero -->
+<section class="mt-3 overflow-hidden rounded-xl border border-line bg-panel">
+  <div class="h-20 bg-gradient-to-r from-brand-600/25 via-panel-2 to-panel"></div>
+  <div class="px-6 pb-6">
+    <div class="-mt-10 flex flex-wrap items-end justify-between gap-4">
+      <div class="flex items-end gap-4">
+        <span class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-brand-600/20 font-display text-3xl text-brand-400 ring-4 ring-panel"><%= member.initials %></span>
+        <div class="pb-1">
+          <h1 class="font-display text-3xl tracking-wide text-white"><%= member.name %></h1>
+          <p class="mt-0.5 text-xs text-zinc-500">
+            Membership no. <span class="text-zinc-300"><%= member.membershipNo %></span>
+            <% if (member.joined) { %> · joined <%= member.joined %><% } %>
+          </p>
+        </div>
+      </div>
+      <div class="flex gap-2 pb-1">
+        <button type="button" data-open-modal="#member-form-modal"
+                class="rounded-lg border border-line bg-panel-2 px-4 py-2 text-sm font-medium text-zinc-200 transition-colors hover:border-brand-600/60 hover:text-white">
+          Edit
+        </button>
+        <% if (staff.role === 'admin') { %>
+          <form method="post" action="/members/<%= member.id %>/remove"
+                onsubmit="return confirm('Deactivate <%= member.name %>?\\nTheir subscriptions, payments and attendance history stay intact.')">
+            <button type="submit"
+                    class="rounded-lg border border-line bg-panel-2 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-brand-700 hover:text-brand-400">
+              Deactivate
+            </button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+
+    <dl class="mt-5 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
+      <div>
+        <dt class="text-xs uppercase tracking-wider text-zinc-600">Email</dt>
+        <dd class="mt-1 truncate text-zinc-300"><%= member.email %></dd>
+      </div>
+      <div>
+        <dt class="text-xs uppercase tracking-wider text-zinc-600">Phone</dt>
+        <dd class="mt-1 text-zinc-300"><%= member.phone %></dd>
+      </div>
+      <div>
+        <dt class="text-xs uppercase tracking-wider text-zinc-600">Gender</dt>
+        <dd class="mt-1 capitalize text-zinc-300"><%= member.gender %></dd>
+      </div>
+      <div>
+        <dt class="text-xs uppercase tracking-wider text-zinc-600">Status</dt>
+        <dd class="mt-1"><span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold <%= membership.chipClass %>"><%= membership.label %></span></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+<% if (toast) { %>
+  <div data-toast class="mt-5 rounded-lg border px-4 py-3 text-sm <%= toast.kind === 'success' ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-300' : 'border-brand-700/50 bg-brand-600/10 text-brand-400' %>">
+    <%= toast.text %>
+  </div>
+<% } %>
+
+<!-- Membership + stats -->
+<section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+  <div class="rounded-xl border border-line bg-panel p-5 xl:col-span-2">
+    <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Membership</p>
+    <% if (membership.planName) { %>
+      <p class="mt-2 font-display text-2xl text-white"><%= membership.planName %></p>
+      <p class="mt-1 text-xs text-zinc-500"><%= membership.period %></p>
+      <% if (typeof membership.daysLeft === 'number') { %>
+        <p class="mt-2 text-xs font-semibold <%= membership.daysLeft <= 7 ? 'text-brand-400' : 'text-emerald-400' %>"><%= membership.daysLeft %> day<%= membership.daysLeft === 1 ? '' : 's' %> remaining</p>
+      <% } %>
+    <% } else { %>
+      <p class="mt-2 font-display text-2xl text-zinc-400"><%= membership.label %></p>
+      <p class="mt-1 text-xs text-zinc-600">Create one from the subscriptions page</p>
+    <% } %>
+  </div>
+
+  <div class="rounded-xl border border-line bg-panel p-5">
+    <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Total visits</p>
+    <p class="mt-2 font-display text-3xl text-white"><%= stats.visits %></p>
+    <% if (stats.openVisits > 0) { %>
+      <p class="mt-1 text-xs font-semibold text-brand-400"><%= stats.openVisits %> in gym right now</p>
+    <% } else { %>
+      <p class="mt-1 text-xs text-zinc-600">none open</p>
+    <% } %>
+  </div>
+
+  <div class="rounded-xl border border-line bg-panel p-5">
+    <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Total paid</p>
+    <p class="mt-2 font-display text-3xl text-white"><%= stats.totalPaid %></p>
+    <p class="mt-1 text-xs text-zinc-600">across <%= stats.subscriptions %> subscription<%= stats.subscriptions === 1 ? '' : 's' %></p>
+  </div>
+</section>
+
+<!-- Subscriptions history -->
+<section class="mt-6 rounded-xl border border-line bg-panel">
+  <header class="flex items-center justify-between border-b border-line px-5 py-4">
+    <h2 class="font-display text-xl tracking-wide text-white">Subscriptions</h2>
+    <a href="/subscriptions" class="text-xs font-medium text-brand-400 transition-colors hover:text-brand-500">New subscription →</a>
+  </header>
+
+  <% if (subscriptions.length === 0) { %>
+    <p class="px-5 py-10 text-center text-sm text-zinc-500">No subscriptions yet for this member.</p>
+  <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-zinc-600">
+            <th class="px-5 py-3 font-semibold">Plan</th>
+            <th class="px-5 py-3 font-semibold">Period</th>
+            <th class="px-5 py-3 font-semibold">Status</th>
+            <th class="px-5 py-3 text-right font-semibold">Auto-renew</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          <% subscriptions.forEach((s) => { %>
+            <tr class="transition-colors hover:bg-panel-2/60">
+              <td class="px-5 py-3 text-zinc-200"><%= s.planName %></td>
+              <td class="px-5 py-3 text-zinc-400"><%= s.period %></td>
+              <td class="px-5 py-3"><span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold <%= s.chipClass %>"><%= s.statusLabel %></span></td>
+              <td class="px-5 py-3 text-right text-zinc-500"><%= s.autoRenew ? 'Yes' : '—' %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</section>
+
+<!-- Payments + attendance -->
+<div class="mt-6 grid gap-6 lg:grid-cols-2">
+  <section class="rounded-xl border border-line bg-panel">
+    <header class="border-b border-line px-5 py-4">
+      <h2 class="font-display text-xl tracking-wide text-white">Payments</h2>
+      <p class="mt-0.5 text-xs text-zinc-600">Most recent 10 of this member's payments</p>
+    </header>
+    <% if (payments.length === 0) { %>
+      <p class="px-5 py-10 text-center text-sm text-zinc-500">No payments recorded yet.</p>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-zinc-600">
+              <th class="px-5 py-3 font-semibold">Reference</th>
+              <th class="px-5 py-3 font-semibold">Amount</th>
+              <th class="px-5 py-3 font-semibold">Status</th>
+              <th class="hidden px-5 py-3 font-semibold sm:table-cell">Paid at</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-line">
+            <% payments.forEach((p) => { %>
+              <tr class="transition-colors hover:bg-panel-2/60">
+                <td class="px-5 py-3 text-zinc-500"><%= p.referenceNo %></td>
+                <td class="px-5 py-3 font-medium text-zinc-200"><%= p.amount %></td>
+                <td class="px-5 py-3"><span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold <%= p.statusClass %>"><%= p.statusLabel %></span></td>
+                <td class="hidden px-5 py-3 text-zinc-400 sm:table-cell"><%= p.paidAt %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+
+  <section class="rounded-xl border border-line bg-panel">
+    <header class="border-b border-line px-5 py-4">
+      <h2 class="font-display text-xl tracking-wide text-white">Attendance</h2>
+      <p class="mt-0.5 text-xs text-zinc-600">Most recent 10 visits</p>
+    </header>
+    <% if (attendance.length === 0) { %>
+      <p class="px-5 py-10 text-center text-sm text-zinc-500">No visits recorded yet.</p>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-zinc-600">
+              <th class="px-5 py-3 font-semibold">Check-in</th>
+              <th class="px-5 py-3 font-semibold">Check-out</th>
+              <th class="px-5 py-3 text-right font-semibold">Duration</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-line">
+            <% attendance.forEach((a) => { %>
+              <tr class="transition-colors hover:bg-panel-2/60">
+                <td class="px-5 py-3 text-zinc-300"><%= a.checkIn %></td>
+                <td class="px-5 py-3 text-zinc-400">
+                  <% if (a.open) { %>
+                    <span class="inline-flex items-center gap-1.5 text-brand-400"><span class="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-500"></span>in gym</span>
+                  <% } else { %>
+                    <%= a.checkOut %>
+                  <% } %>
+                </td>
+                <td class="px-5 py-3 text-right text-zinc-500"><%= a.duration ?? '—' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    <% } %>
+  </section>
+</div>
+
+<%- include('form.ejs', { form: editForm }) %>

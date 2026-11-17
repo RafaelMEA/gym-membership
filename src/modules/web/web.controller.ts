@@ -1,12 +1,13 @@
 import type { Request, Response, NextFunction } from 'express'
 import { ZodError } from 'zod'
-import type { RowDataPacket } from 'mysql2'
 import { loginStaff } from '../auth/staff.service.js'
 import { AppError } from '../../middleware/error.js'
 import { env } from '../../config/env.js'
-import { pool } from '../../config/db.js'
 import { daysBetween } from '../../lib/dates.js'
 import { renderPage, renderStandalone } from './render.js'
+import {
+  getToday, formatDate, formatTime, peso,
+} from './view.js'
 import * as memberRepo from '../members/member.repository.js'
 import * as planRepo from '../plans/plans.repository.js'
 import * as subRepo from '../subscriptions/subscriptions.repository.js'
@@ -20,45 +21,6 @@ const COOKIE_OPTIONS = {
   secure: env.NODE_ENV === 'production',
   maxAge: 3600_000,
 } as const
-
-// ─────────────────────────────────────────────────────────────
-// Display-only helpers (values shown in the browser)
-// ─────────────────────────────────────────────────────────────
-
-const peso = new Intl.NumberFormat('en-PH', {
-  style: 'currency',
-  currency: 'PHP',
-  maximumFractionDigits: 2,
-})
-
-const MONTHS = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-]
-
-/** '2026-11-20' -> 'Nov 20, 2026' */
-function formatDate(iso: string): string {
-  const [y, m, d] = iso.split('-').map(Number)
-  if (y === undefined || m === undefined || d === undefined) return iso
-  const month = MONTHS[m - 1]
-  if (month === undefined) return iso
-  return `${month} ${d}, ${y}`
-}
-
-/** '2026-11-14 08:30:12' -> '08:30' (dateStrings: true DATETIME format) */
-function formatTime(dt: string | null): string | null {
-  return dt === null ? null : dt.slice(11, 16)
-}
-
-/** Today's date comes from the DB clock, like everywhere else. */
-async function getToday(): Promise<string> {
-  const [rows] = await pool.execute('SELECT CURDATE() AS today')
-  const row = (rows as Array<{ today: string } & RowDataPacket>)[0]
-  if (!row?.today) {
-    throw new Error('Failed to get CURDATE() from database')
-  }
-  return row.today
-}
 
 // ─────────────────────────────────────────────────────────────
 // Pages

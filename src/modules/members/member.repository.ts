@@ -7,6 +7,9 @@ export interface MemberRow extends RowDataPacket {
   first_name: string
   last_name: string
   email: string
+  phone: string | null
+  gender: string
+  created_at: string
 }
 
 export interface CreateMemberData {
@@ -35,14 +38,14 @@ export async function findByEmail(email: string) {
 // get all members
 export async function findAll(): Promise<MemberRow[]> {
   const [rows] = await pool.query(
-  'SELECT id, membership_no, first_name, last_name, email FROM members WHERE is_active = 1')
+  'SELECT id, membership_no, first_name, last_name, email, phone, gender, created_at FROM members WHERE is_active = 1')
   return rows as MemberRow[]
 }
 
 // get member by id
 export async function findById(id: number): Promise<MemberRow | null> {
   const [rows] = await pool.execute(
-  `SELECT id, membership_no, first_name, last_name, email
+  `SELECT id, membership_no, first_name, last_name, email, phone, gender, created_at
    FROM members WHERE id = ? AND is_active = 1`, [id])
   return (rows as MemberRow[])[0] ?? null
 }
@@ -58,7 +61,7 @@ export async function create(data: CreateMemberData): Promise<MemberRow> {
   const insertId = (result as ResultSetHeader).insertId
 
   const [rows] = await pool.execute(
-    `SELECT id, membership_no, first_name, last_name, email
+    `SELECT id, membership_no, first_name, last_name, email, phone, gender, created_at
      FROM members WHERE id = ?`,
     [insertId],
   )
