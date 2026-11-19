@@ -1,0 +1,132 @@
+<!-- Page head -->
+<div class="flex flex-wrap items-end justify-between gap-4">
+  <div>
+    <h1 class="font-display text-4xl tracking-wide text-white">Payments</h1>
+    <p class="mt-1 text-sm text-zinc-500">Permanent billing records — refunds, never deletes.</p>
+  </div>
+  <button type="button" data-open-modal="#payment-form-modal"
+          class="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500">
+    + Record payment
+  </button>
+</div>
+
+<% if (toast) { %>
+  <div data-toast class="mt-5 rounded-lg border px-4 py-3 text-sm <%= toast.kind === 'success' ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-300' : 'border-brand-700/50 bg-brand-600/10 text-brand-400' %>">
+    <%= toast.text %>
+  </div>
+<% } %>
+
+<!-- Filter tabs -->
+<div class="mt-6 flex flex-wrap gap-2">
+  <% const tabs = [
+       { key: '', label: 'All', count: counts.all },
+       { key: 'paid', label: 'Paid', count: counts.paid },
+       { key: 'pending', label: 'Pending', count: counts.pending },
+       { key: 'refunded', label: 'Refunded', count: counts.refunded },
+       { key: 'failed', label: 'Failed', count: counts.failed },
+     ] %>
+  <% tabs.forEach((t) => { %>
+    <a href="<%= t.key === '' ? '/payments' : `/payments?status=${t.key}` %>"
+       class="rounded-lg border px-3.5 py-2 text-sm font-medium transition-colors
+              <%= status === t.key
+                    ? 'border-brand-600/60 bg-brand-600/15 text-white'
+                    : 'border-line bg-panel text-zinc-400 hover:text-zinc-200' %>">
+      <%= t.label %>
+      <span class="ml-1.5 rounded px-1.5 py-0.5 text-[10px] font-semibold <%= status === t.key ? 'bg-brand-600/30 text-brand-300' : 'bg-zinc-800 text-zinc-500' %>"><%= t.count %></span>
+    </a>
+  <% }) %>
+</div>
+
+<!-- Table -->
+<section class="mt-4 overflow-hidden rounded-xl border border-line bg-panel">
+  <% if (payments.length === 0) { %>
+    <div class="px-6 py-14 text-center">
+      <p class="font-display text-2xl text-white">No payments<%= status ? ` (${status})` : '' %> yet</p>
+      <p class="mt-1 text-sm text-zinc-500">Record one with the button above.</p>
+    </div>
+  <% } else { %>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-zinc-600">
+            <th class="px-5 py-3 font-semibold">Reference</th>
+            <th class="px-5 py-3 font-semibold">Member</th>
+            <th class="px-5 py-3 font-semibold">Amount</th>
+            <th class="hidden px-5 py-3 font-semibold lg:table-cell">Method</th>
+            <th class="px-5 py-3 font-semibold">Status</th>
+            <th class="hidden px-5 py-3 font-semibold xl:table-cell">Paid on</th>
+            <th class="px-5 py-3 text-right font-semibold"><span class="sr-only">Actions</span></th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-line">
+          <% payments.forEach((p) => { %>
+            <tr class="transition-colors hover:bg-panel-2/60">
+              <td class="px-5 py-3">
+                <span class="text-zinc-400"><%= p.referenceNo %></span>
+                <% if (p.notes) { %>
+                  <span class="block max-w-[16rem] truncate text-[11px] text-zinc-600" title="<%= p.notes %>"><%= p.notes %></span>
+                <% } %>
+              </td>
+              <td class="px-5 py-3">
+                <% if (p.memberId) { %>
+                  <a href="/members/<%= p.memberId %>" class="font-medium text-zinc-200 transition-colors hover:text-brand-400"><%= p.memberName %></a>
+                <% } else { %>
+                  <span class="text-zinc-500"><%= p.memberName %></span>
+                <% } %>
+              </td>
+              <td class="px-5 py-3 font-medium text-zinc-200"><%= p.amount %></td>
+              <td class="hidden px-5 py-3 text-zinc-400 lg:table-cell"><%= p.method %></td>
+              <td class="px-5 py-3"><span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold <%= p.statusClass %>"><%= p.statusLabel %></span></td>
+              <td class="hidden px-5 py-3 text-zinc-500 xl:table-cell"><%= p.paidAt %></td>
+              <td class="px-5 py-3 text-right">
+                <% if (p.canRefund) { %>
+                  <button type="button"
+                          data-refund="<%= p.id %>"
+                          data-ref="<%= p.referenceNo %>"
+                          data-amount="<%= p.amount %>"
+                          data-member="<%= p.memberName %>"
+                          class="text-xs font-medium text-zinc-500 transition-colors hover:text-brand-400">
+                    Refund
+                  </button>
+                <% } %>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</section>
+
+<p class="mt-4 text-[11px] text-zinc-600">
+  Standard rates: ₱50 per session · ₱450/month students · ₱550/month regular.
+</p>
+
+<%- include('form.ejs') %>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    // Prefill the amount from the selected subscription's plan price
+    const payModal = document.getElementById('payment-form-modal')
+    const subSelect = payModal.querySelector('[name="subscription_id"]')
+    const amountInput = payModal.querySelector('[name="amount"]')
+    subSelect.addEventListener('change', () => {
+      const opt = subSelect.selectedOptions[0]
+      const price = opt ? opt.dataset.price : null
+      if (price) amountInput.value = price
+    })
+
+    // Refund modal: point the form at the chosen payment
+    const refundModal = document.getElementById('refund-form-modal')
+    const refundForm = refundModal.querySelector('form')
+    const refundLabel = refundModal.querySelector('[data-refund-label]')
+    document.querySelectorAll('[data-refund]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const d = btn.dataset
+        refundForm.action = '/payments/' + d.refund + '/refund'
+        refundLabel.textContent = d.ref + ' — ' + d.amount + ' · ' + d.member
+        openModal(refundModal)
+      })
+    })
+  })
+</script>

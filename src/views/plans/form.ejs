@@ -1,0 +1,101 @@
+<%
+  // Shared plan modal — create (default) or edit (JS sets action and
+  // prefills; the server re-renders it open with values on errors).
+  const labelCls = 'block text-xs font-semibold uppercase tracking-wider text-zinc-400'
+  const inputCls = 'mt-1.5 w-full rounded-lg border bg-panel px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-600/30'
+  const isEdit = form.action !== '/plans'
+%>
+
+<div id="plan-form-modal" data-modal class="fixed inset-0 z-50 <%= form.open ? 'flex' : 'hidden' %> items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close-modal></div>
+
+  <div class="relative w-full max-w-lg rounded-2xl border border-line bg-panel shadow-2xl">
+    <header class="flex items-start justify-between border-b border-line px-6 py-4">
+      <div>
+        <h2 class="font-display text-2xl tracking-wide text-white" data-plan-form-title><%= isEdit ? 'Edit plan' : 'Add plan' %></h2>
+        <p class="mt-0.5 text-xs text-zinc-500"><%= form.subtitle %></p>
+      </div>
+      <button type="button" data-close-modal aria-label="Close"
+              class="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-panel-2 hover:text-zinc-300">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </header>
+
+    <form method="post" action="<%= form.action %>" class="max-h-[70vh] overflow-y-auto px-6 py-5">
+      <% if (form.message) { %>
+        <div class="mb-4 rounded-lg border border-brand-700/50 bg-brand-600/10 px-4 py-3 text-sm text-brand-400" role="alert">
+          <%= form.message %>
+        </div>
+      <% } %>
+
+      <div class="grid gap-4 sm:grid-cols-2">
+        <div class="sm:col-span-2">
+          <label for="pf-name" class="<%= labelCls %>">Name</label>
+          <input id="pf-name" name="name" value="<%= form.values.name %>" required placeholder="Gold Monthly"
+                 class="<%= inputCls %> <%= form.fieldErrors.name ? 'border-brand-600' : 'border-line' %>">
+          <% if (form.fieldErrors.name) { %>
+            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.name %></p>
+          <% } %>
+        </div>
+
+        <div>
+          <label for="pf-price" class="<%= labelCls %>">Price (₱)</label>
+          <input id="pf-price" name="price" type="number" min="0" step="0.01" value="<%= form.values.price %>" required placeholder="550.00"
+                 class="<%= inputCls %> <%= form.fieldErrors.price ? 'border-brand-600' : 'border-line' %>">
+          <% if (form.fieldErrors.price) { %>
+            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.price %></p>
+          <% } %>
+        </div>
+
+        <div>
+          <label for="pf-max-visits" class="<%= labelCls %>">Max visits <span class="normal-case text-zinc-600">optional</span></label>
+          <input id="pf-max-visits" name="max_visits_per_period" type="number" min="1" step="1" value="<%= form.values.max_visits_per_period %>" placeholder="Unlimited"
+                 class="<%= inputCls %> <%= form.fieldErrors.max_visits_per_period ? 'border-brand-600' : 'border-line' %>">
+          <% if (form.fieldErrors.max_visits_per_period) { %>
+            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.max_visits_per_period %></p>
+          <% } %>
+        </div>
+
+        <div>
+          <label for="pf-duration-value" class="<%= labelCls %>">Duration</label>
+          <input id="pf-duration-value" name="duration_value" type="number" min="1" step="1" value="<%= form.values.duration_value %>" required
+                 class="<%= inputCls %> <%= form.fieldErrors.duration_value ? 'border-brand-600' : 'border-line' %>">
+          <% if (form.fieldErrors.duration_value) { %>
+            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.duration_value %></p>
+          <% } %>
+        </div>
+
+        <div>
+          <label for="pf-duration-unit" class="<%= labelCls %>">Unit</label>
+          <select id="pf-duration-unit" name="duration_unit"
+                  class="<%= inputCls %> <%= form.fieldErrors.duration_unit ? 'border-brand-600' : 'border-line' %>">
+            <% ['day', 'week', 'month', 'year'].forEach((u) => { %>
+              <option value="<%= u %>" <%= form.values.duration_unit === u ? 'selected' : '' %>><%= u.charAt(0).toUpperCase() + u.slice(1) %></option>
+            <% }) %>
+          </select>
+          <% if (form.fieldErrors.duration_unit) { %>
+            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.duration_unit %></p>
+          <% } %>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label for="pf-description" class="<%= labelCls %>">Description <span class="normal-case text-zinc-600">optional</span></label>
+          <textarea id="pf-description" name="description" rows="2" placeholder="What is included in this plan?"
+                    class="<%= inputCls %> <%= form.fieldErrors.description ? 'border-brand-600' : 'border-line' %>"><%= form.values.description %></textarea>
+          <% if (form.fieldErrors.description) { %>
+            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.description %></p>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="mt-6 flex justify-end gap-2 border-t border-line pt-4">
+        <button type="button" data-close-modal
+                class="rounded-lg px-4 py-2.5 text-sm font-medium text-zinc-400 transition-colors hover:text-zinc-200">Cancel</button>
+        <button type="submit"
+                class="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500">
+          <%= form.submitLabel %>
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

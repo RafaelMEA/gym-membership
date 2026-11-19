@@ -2,6 +2,9 @@ import { Router } from 'express'
 import { showLogin, login, logout, dashboard } from './web.controller.js'
 import * as membersPages from './members.pages.js'
 import * as subscriptionsPages from './subscriptions.pages.js'
+import * as plansPages from './plans.pages.js'
+import * as paymentsPages from './payments.pages.js'
+import * as attendancePages from './attendance.pages.js'
 import { requirePageAuth, redirectIfAuthed } from '../../middleware/requirePageAuth.js'
 
 const router = Router()
@@ -26,5 +29,21 @@ router.get('/members/:id', requirePageAuth, membersPages.detail)
 // Subscriptions
 router.get('/subscriptions', requirePageAuth, subscriptionsPages.list)
 router.post('/subscriptions', requirePageAuth, subscriptionsPages.create)
+
+// Plans
+router.get('/plans', requirePageAuth, plansPages.list)
+router.post('/plans', requirePageAuth, plansPages.create)
+router.post('/plans/:id/remove', requirePageAuth, plansPages.remove)
+router.post('/plans/:id', requirePageAuth, plansPages.update)
+
+// Payments (no delete — refund only)
+router.get('/payments', requirePageAuth, paymentsPages.list)
+router.post('/payments', requirePageAuth, paymentsPages.create)
+router.post('/payments/:id/refund', requirePageAuth, paymentsPages.refund)
+
+// Attendance — action endpoints, not CRUD
+router.get('/attendance', requirePageAuth, attendancePages.index)
+router.post('/attendance/check-in', requirePageAuth, attendancePages.checkIn)
+router.post('/attendance/check-out', requirePageAuth, attendancePages.checkOut)
 
 export const webRouter = router

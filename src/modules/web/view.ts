@@ -109,6 +109,16 @@ export async function getToday(): Promise<string> {
   return row.today
 }
 
+/** Current DB timestamp — used for elapsed-time display. */
+export async function getNow(): Promise<string> {
+  const [rows] = await pool.execute('SELECT NOW() AS now')
+  const row = (rows as Array<{ now: string } & RowDataPacket>)[0]
+  if (!row?.now) {
+    throw new Error('Failed to get NOW() from database')
+  }
+  return row.now
+}
+
 // ── zod / body helpers ──────────────────────────────────────
 
 /** ZodError -> { fieldName: firstMessage } for inline form errors. */

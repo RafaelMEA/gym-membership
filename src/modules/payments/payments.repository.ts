@@ -59,9 +59,13 @@ export async function create(
   data: CreatePaymentData,
   db: DbExecutor = pool,
 ): Promise<PaymentRow> {
+  // reference_no is NOT NULL + UNIQUE with no DB default. Insert a
+  // temporary unique value, then stamp the human-readable receipt number
+  // from the auto-increment id: RCPT-2026-0005. Both statements run in the
+  // caller's transaction, so the placeholder never escapes.
   const [result] = await db.execute<ResultSetHeader>(
-    `INSERT INTO payments (subscription_id, amount, method, status, paid_at, notes)
-     VALUES (?, ?, ?, ?, ?, ?)`,
+    `INSERT INTO payments (subscription_id, reference_no, amount, method, status, paid_at, notes)
+     VALUES (?, UUID(), ?, ?, ?, ?, ?)`,
     [
       data.subscription_id,
       data.amount,
@@ -72,7 +76,15 @@ export async function create(
     ],
   );
 
-  const created = await findById(result.insertId, db);
+  const insertId = result.insertId;
+  await db.execute(
+    `UPDATE payments
+        SET reference_no = CONCAT('RCPT-', YEAR(NOW()), '-', LPAD(?, 4, '0'))
+      WHERE id = ?`,
+    [insertId, insertId],
+  );
+
+  const created = await findById(insertId, db);
   if (!created) {
     throw new Error("Failed to load created payment");
   }
