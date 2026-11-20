@@ -6,7 +6,7 @@ import { env } from '../../config/env.js'
 import { daysBetween } from '../../lib/dates.js'
 import { renderPage, renderStandalone } from './render.js'
 import {
-  getToday, formatDate, formatTime, peso,
+  getToday, formatDate, formatTime, peso, flashToast,
 } from './view.js'
 import * as memberRepo from '../members/member.repository.js'
 import * as planRepo from '../plans/plans.repository.js'
@@ -32,9 +32,18 @@ export async function showLogin(
   next: NextFunction,
 ) {
   try {
+    // Login failures and sign-outs use the same right-hand toast stack
+    // as the rest of the app. Success lands on the dashboard instead.
+    const toast =
+      req.query.error === '1'
+        ? { kind: 'error' as const, text: 'Incorrect email or password. Please try again.' }
+        : req.query.loggedout !== undefined
+          ? { kind: 'success' as const, text: 'Signed out successfully. See you next shift!' }
+          : null
+
     await renderStandalone(res, 'auth/login.ejs', {
       title: 'Sign in',
-      error: req.query.error === '1',
+      toast,
     })
   } catch (err) {
     next(err)
@@ -53,7 +62,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
   try {
     const { token } = await loginStaff(req.body)
     res.cookie('token', token, COOKIE_OPTIONS)
-    res.redirect('/')
+    res.redirect('/?welcome=1')
   } catch (err) {
     if (err instanceof AppError || err instanceof ZodError) {
       res.redirect('/login?error=1')
@@ -65,7 +74,7 @@ export async function login(req: Request, res: Response, next: NextFunction) {
 
 export function logout(_req: Request, res: Response) {
   res.clearCookie('token')
-  res.redirect('/login')
+  res.redirect('/login?loggedout=1')
 }
 
 /**
@@ -76,7 +85,7 @@ export function logout(_req: Request, res: Response) {
  * queries — the view data shape stays the same.
  */
 export async function dashboard(
-  _req: Request,
+  req: Request,
   res: Response,
   next: NextFunction,
 ) {
@@ -136,6 +145,9 @@ export async function dashboard(
       title: 'Dashboard',
       activeNav: 'dashboard',
       staff,
+      toast: flashToast(req.query, {
+        welcome: 'Signed in successfully. Welcome back!',
+      }),
       todayLabel: formatDate(today),
       stats: {
         totalMembers: members.length,

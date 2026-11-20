@@ -8,17 +8,16 @@ import * as attendanceRepo from '../attendance/attendance.repository.js'
 import * as paymentRepo from '../payments/payments.repository.js'
 import * as planRepo from '../plans/plans.repository.js'
 import { AppError } from '../../middleware/error.js'
-import { daysBetween } from '../../lib/dates.js'
+import { addDuration, daysBetween, daysInMonth } from '../../lib/dates.js'
 import { renderPage } from './render.js'
 import {
   CHIP,
   flashToast,
   formatDate,
   formatDateTime,
-  formatDuration,
+  formatTime,
   getToday,
   initialsOf,
-  minutesBetween,
   peso,
   str,
   subState,
@@ -185,6 +184,14 @@ interface MemberDetailPageView {
   staff: StaffLocal
   toast: Toast | null
   editForm: FormState
+  /** 'YYYY-MM' calendar month; defaults to the current month. */
+  month?: string | null
+}
+
+const MONTH_PARAM = /^\d{4}-(0[1-9]|1[0-2])$/
+
+function readMonthParam(value: unknown): string | null {
+  return typeof value === 'string' && MONTH_PARAM.test(value) ? value : null
 }
 
 async function renderMemberDetailPage(
@@ -252,6 +259,67 @@ async function renderMemberDetailPage(
     failed: CHIP.red,
   }
 
+  // ── Attendance calendar ─────────────────────────────────
+  // The member page shows a monthly calendar (not a table): one cell per
+  // day, with a check mark on every date that has at least one visit.
+  const currentMonth = today.slice(0, 7)
+  const month = view.month ?? currentMonth
+  const year = Number(month.slice(0, 4))
+  const monthNumber = Number(month.slice(5, 7))
+  const monthStart = `${month}-01`
+  const prevMonth = addDuration(monthStart, -1, 'month').slice(0, 7)
+  const nextMonth = addDuration(monthStart, 1, 'month').slice(0, 7)
+
+  const visitsByDay = new Map<string, (typeof attendance)[number][]>()
+  for (const a of attendance) {
+    const date = a.check_in.slice(0, 10)
+    if (!date.startsWith(month)) continue
+    const list = visitsByDay.get(date)
+    if (list) list.push(a)
+    else visitsByDay.set(date, [a])
+  }
+
+  const firstWeekday = new Date(Date.UTC(year, monthNumber - 1, 1)).getUTCDay()
+  const totalDays = daysInMonth(year, monthNumber)
+  const cellCount = Math.ceil((firstWeekday + totalDays) / 7) * 7
+  const pad = (n: number) => String(n).padStart(2, '0')
+
+  const calendarDays = Array.from({ length: cellCount }, (_, index) => {
+    const dayNumber = index - firstWeekday + 1
+    const inMonth = dayNumber >= 1 && dayNumber <= totalDays
+    const dateKey = `${month}-${pad(dayNumber)}`
+    const visits = inMonth ? visitsByDay.get(dateKey) ?? [] : []
+    // Repo returns newest-first; reverse so tooltips read chronologically.
+    const times = visits
+      .map((v) => formatTime(v.check_in))
+      .filter((t): t is string => t !== null)
+      .reverse()
+
+    return {
+      // Date.UTC normalizes out-of-range days, so leading/trailing cells
+      // still show the neighbouring month's date.
+      day: inMonth
+        ? dayNumber
+        : new Date(Date.UTC(year, monthNumber - 1, dayNumber)).getUTCDate(),
+      inMonth,
+      isToday: inMonth && dateKey === today,
+      count: visits.length,
+      firstTime: times[0] ?? '',
+      title: times.length > 0 ? `Checked in at ${times.join(', ')}` : '',
+    }
+  })
+
+  const visitsThisMonth = [...visitsByDay.values()].reduce(
+    (sum, list) => sum + list.length,
+    0,
+  )
+
+  const monthLabel = new Intl.DateTimeFormat('en-US', {
+    month: 'long',
+    year: 'numeric',
+    timeZone: 'UTC',
+  }).format(new Date(Date.UTC(year, monthNumber - 1, 1)))
+
   await renderPage(res, 'members/detail.ejs', {
     title: name,
     activeNav: 'members',
@@ -295,13 +363,15 @@ async function renderMemberDetailPage(
       statusClass: paymentChip[p.status] ?? CHIP.gray,
       paidAt: formatDateTime(p.paid_at) ?? '—',
     })),
-    attendance: attendance.slice(0, 10).map((a) => ({
-      id: a.id,
-      checkIn: formatDateTime(a.check_in) ?? '—',
-      checkOut: a.check_out === null ? null : formatDateTime(a.check_out),
-      duration: a.check_out === null ? null : formatDuration(minutesBetween(a.check_in, a.check_out)),
-      open: a.check_out === null,
-    })),
+    calendar: {
+      month,
+      label: monthLabel,
+      prevMonth,
+      nextMonth,
+      visitsThisMonth,
+      canGoNext: month < currentMonth,
+      days: calendarDays,
+    },
   })
 }
 
@@ -324,6 +394,7 @@ export async function detail(req: Request, res: Response, next: NextFunction) {
       staff: res.locals.staff as StaffLocal,
       toast: flashToast(req.query, { updated: 'Member updated.' }),
       editForm: editForm(id, memberValuesFrom(member), {}),
+      month: readMonthParam(req.query.month),
     })
   } catch (err) {
     next(err)

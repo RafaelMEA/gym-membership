@@ -128,7 +128,8 @@ async function renderAttendancePage(
     stats: {
       inGym: inGym.length,
       todayVisits: todayVisits.length,
-      eligible: directory.filter((m) => m.planName !== null).length,
+      // Counted across the whole directory, not just the current search
+      eligible: members.filter((m) => running.has(m.id)).length,
     },
     inGym,
     todayVisits,

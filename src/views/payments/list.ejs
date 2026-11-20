@@ -10,12 +10,6 @@
   </button>
 </div>
 
-<% if (toast) { %>
-  <div data-toast class="mt-5 rounded-lg border px-4 py-3 text-sm <%= toast.kind === 'success' ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-300' : 'border-brand-700/50 bg-brand-600/10 text-brand-400' %>">
-    <%= toast.text %>
-  </div>
-<% } %>
-
 <!-- Filter tabs -->
 <div class="mt-6 flex flex-wrap gap-2">
   <% const tabs = [
@@ -85,7 +79,7 @@
                           data-ref="<%= p.referenceNo %>"
                           data-amount="<%= p.amount %>"
                           data-member="<%= p.memberName %>"
-                          class="text-xs font-medium text-zinc-500 transition-colors hover:text-brand-400">
+                          class="btn btn-danger btn-sm">
                     Refund
                   </button>
                 <% } %>

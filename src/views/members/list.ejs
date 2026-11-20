@@ -2,7 +2,7 @@
 <div class="flex flex-wrap items-end justify-between gap-4">
   <div>
     <h1 class="font-display text-4xl tracking-wide text-white">Members</h1>
-    <p class="mt-1 text-sm text-zinc-500">
+    <p id="members-count" data-live-sync aria-live="polite" class="mt-1 text-sm text-zinc-500">
       <%= q ? `${members.length} of ${totalCount} members` : `${totalCount} member${totalCount === 1 ? '' : 's'} on file` %>
     </p>
   </div>
@@ -12,24 +12,17 @@
   </button>
 </div>
 
-<% if (toast) { %>
-  <div data-toast class="mt-5 rounded-lg border px-4 py-3 text-sm <%= toast.kind === 'success' ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-300' : 'border-brand-700/50 bg-brand-600/10 text-brand-400' %>">
-    <%= toast.text %>
-  </div>
-<% } %>
-
-<!-- Search -->
-<form method="get" action="/members" class="mt-6 flex max-w-lg gap-2">
+<!-- Search (live: filters as you type, falls back to GET) -->
+<form method="get" action="/members" data-live-search class="mt-6 flex max-w-lg gap-2">
   <input type="search" name="q" value="<%= q %>" placeholder="Search name, email or membership no…"
+         autocomplete="off" spellcheck="false"
          class="w-full rounded-lg border border-line bg-panel px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-600/30">
-  <button type="submit" class="rounded-lg border border-line bg-panel-2 px-4 text-sm font-medium text-zinc-300 transition-colors hover:border-brand-600/60 hover:text-white">Search</button>
-  <% if (q) { %>
-    <a href="/members" class="px-3 py-2.5 text-sm text-zinc-500 transition-colors hover:text-zinc-300">Clear</a>
-  <% } %>
+  <button type="submit" class="rounded-lg border border-line bg-panel-2 px-4 text-sm font-medium text-zinc-300 transition-colors hover:border-brand-600/60 hover:text-white disabled:cursor-not-allowed disabled:opacity-50">Search</button>
+  <a href="/members" data-live-clear class="btn btn-secondary<%= q ? '' : ' hidden' %>">Clear</a>
 </form>
 
 <!-- Table -->
-<section class="mt-4 overflow-hidden rounded-xl border border-line bg-panel">
+<section id="members-results" data-live-results aria-busy="false" class="mt-4 overflow-hidden rounded-xl border border-line bg-panel">
   <% if (members.length === 0) { %>
     <div class="px-6 py-14 text-center">
       <p class="font-display text-2xl text-white"><%= q ? 'No members match your search' : 'No members yet' %></p>
@@ -62,7 +55,7 @@
               <td class="hidden px-5 py-3 text-zinc-400 sm:table-cell"><%= m.email %></td>
               <td class="hidden px-5 py-3 text-zinc-400 lg:table-cell"><%= m.phone ?? '—' %></td>
               <td class="px-5 py-3 text-right">
-                <a href="/members/<%= m.id %>" class="text-xs font-medium text-brand-400 transition-colors hover:text-brand-500">View →</a>
+                <a href="/members/<%= m.id %>" class="btn btn-secondary btn-sm">View →</a>
               </td>
             </tr>
           <% }) %>

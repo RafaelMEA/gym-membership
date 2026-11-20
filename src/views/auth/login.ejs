@@ -9,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/css/app.css">
+  <script src="/static/js/app.js" defer></script>
 </head>
 <body class="min-h-screen bg-ink font-sans text-zinc-200 antialiased">
   <div class="grid min-h-screen lg:grid-cols-2">
@@ -50,12 +51,6 @@
         <h1 class="font-display text-3xl text-white">Staff sign in</h1>
         <p class="mt-1 text-sm text-zinc-500">Use your staff account to manage the gym.</p>
 
-        <% if (error) { %>
-          <div class="mt-5 rounded-lg border border-brand-700/50 bg-brand-600/10 px-4 py-3 text-sm text-brand-400" role="alert">
-            Invalid email or password.
-          </div>
-        <% } %>
-
         <form method="post" action="/login" class="mt-6 space-y-4">
           <div>
             <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Email</label>
@@ -82,5 +77,7 @@
     </div>
 
   </div>
+
+  <%- include('../layout/toast.ejs') %>
 </body>
 </html>

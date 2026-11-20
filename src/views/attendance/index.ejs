@@ -10,12 +10,6 @@
   </a>
 </div>
 
-<% if (toast) { %>
-  <div data-toast class="mt-5 rounded-lg border px-4 py-3 text-sm <%= toast.kind === 'success' ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-300' : 'border-brand-700/50 bg-brand-600/10 text-brand-400' %>">
-    <%= toast.text %>
-  </div>
-<% } %>
-
 <!-- Stats -->
 <div class="mt-6 grid grid-cols-3 gap-4">
   <div class="rounded-xl border border-line bg-panel p-5">
@@ -44,18 +38,18 @@
         <h2 class="font-display text-xl tracking-wide text-white">Check in</h2>
         <p class="mt-0.5 text-xs text-zinc-600">Members with a running subscription can be checked in.</p>
       </div>
-      <span class="shrink-0 text-xs text-zinc-600"><%= directory.length %> shown</span>
+      <span id="directory-count" data-live-sync aria-live="polite" class="shrink-0 text-xs text-zinc-600"><%= directory.length %> shown</span>
     </header>
 
-    <form method="get" action="/attendance" class="flex gap-2 border-b border-line px-5 py-3">
+    <form method="get" action="/attendance" data-live-search class="flex gap-2 border-b border-line px-5 py-3">
       <input type="search" name="q" value="<%= q %>" placeholder="Search name or membership no…"
+             autocomplete="off" spellcheck="false"
              class="w-full rounded-lg border border-line bg-panel-2 px-3.5 py-2 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-600/30">
-      <button type="submit" class="rounded-lg border border-line bg-panel-2 px-4 text-sm font-medium text-zinc-300 transition-colors hover:border-brand-600/60 hover:text-white">Search</button>
-      <% if (q) { %>
-        <a href="/attendance" class="px-2 py-2 text-sm text-zinc-500 transition-colors hover:text-zinc-300">Clear</a>
-      <% } %>
+      <button type="submit" class="rounded-lg border border-line bg-panel-2 px-4 text-sm font-medium text-zinc-300 transition-colors hover:border-brand-600/60 hover:text-white disabled:cursor-not-allowed disabled:opacity-50">Search</button>
+      <a href="/attendance" data-live-clear class="btn btn-secondary<%= q ? '' : ' hidden' %>">Clear</a>
     </form>
 
+    <div id="directory-results" data-live-results aria-busy="false">
     <% if (directory.length === 0) { %>
       <div class="px-6 py-14 text-center">
         <p class="font-display text-2xl text-white"><%= q ? 'No members match your search' : 'No members yet' %></p>
@@ -75,13 +69,13 @@
                 <span class="text-[11px] text-zinc-600"><%= m.membershipNo %></span>
               </div>
               <% if (m.planName) { %>
-                <div class="mt-1 flex flex-wrap items-center gap-2">
-                  <span class="text-xs text-zinc-500"><%= m.planName %></span>
-                  <span class="rounded-full px-2 py-0.5 text-[10px] font-semibold
+                <div class="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1.5">
+                  <span class="min-w-0 truncate text-xs text-zinc-500"><%= m.planName %></span>
+                  <span class="inline-flex shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-medium
                                <%= m.daysLeft <= 2
                                      ? 'bg-brand-600/15 text-brand-400 ring-1 ring-brand-600/40'
                                      : 'bg-zinc-800 text-zinc-400' %>">
-                    <%= m.daysLeft %>d left
+                    <%= m.daysLeft %> day<%= m.daysLeft === 1 ? '' : 's' %> left
                   </span>
                 </div>
               <% } else { %>
@@ -104,13 +98,14 @@
                   Since <%= m.inGymSince %>
                 </span>
               <% } else { %>
-                <a href="/members/<%= m.id %>" class="text-xs font-medium text-zinc-500 transition-colors hover:text-brand-400">View</a>
+                <a href="/members/<%= m.id %>" class="btn btn-secondary btn-sm">View</a>
               <% } %>
             </div>
           </li>
         <% }) %>
       </ul>
     <% } %>
+    </div>
   </section>
 
   <!-- Right column -->

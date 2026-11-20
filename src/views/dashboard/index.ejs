@@ -113,13 +113,13 @@
             <li class="flex items-center justify-between gap-3 px-5 py-3.5">
               <div class="min-w-0">
                 <p class="truncate text-sm text-zinc-200"><%= e.memberName %></p>
-                <p class="text-xs text-zinc-600"><%= e.planName %> · ends <%= e.endDate %></p>
+                <p class="truncate text-xs text-zinc-600"><%= e.planName %> · ends <%= e.endDate %></p>
               </div>
-              <span class="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold
+              <span class="shrink-0 whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold
                            <%= e.daysLeft <= 2
                                  ? 'bg-brand-600/15 text-brand-400 ring-1 ring-brand-600/40'
                                  : 'bg-zinc-800 text-zinc-400' %>">
-                <%= e.daysLeft %>d left
+                <%= e.daysLeft %> day<%= e.daysLeft === 1 ? '' : 's' %> left
               </span>
             </li>
           <% }) %>

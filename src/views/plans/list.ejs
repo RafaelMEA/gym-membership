@@ -10,12 +10,6 @@
   </button>
 </div>
 
-<% if (toast) { %>
-  <div data-toast class="mt-5 rounded-lg border px-4 py-3 text-sm <%= toast.kind === 'success' ? 'border-emerald-600/40 bg-emerald-500/10 text-emerald-300' : 'border-brand-700/50 bg-brand-600/10 text-brand-400' %>">
-    <%= toast.text %>
-  </div>
-<% } %>
-
 <% if (plans.length === 0) { %>
   <section class="mt-6 rounded-xl border border-line bg-panel px-6 py-14 text-center">
     <p class="font-display text-2xl text-white">No plans yet</p>
@@ -37,9 +31,9 @@
 
         <p class="mt-3 flex-1 text-sm leading-relaxed text-zinc-400"><%= p.description ?? '' %></p>
 
-        <div class="mt-4 flex items-center justify-between border-t border-line pt-3">
+        <div class="mt-4 flex flex-wrap items-center justify-between gap-2 border-t border-line pt-3">
           <span class="text-xs text-zinc-600"><%= p.usage %> subscription<%= p.usage === 1 ? '' : 's' %></span>
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2">
             <button type="button"
                     data-edit-plan
                     data-id="<%= p.id %>"
@@ -49,14 +43,18 @@
                     data-duration-value="<%= p.durationValue %>"
                     data-duration-unit="<%= p.durationUnit %>"
                     data-max-visits="<%= p.maxVisits ?? '' %>"
-                    class="text-xs font-medium text-brand-400 transition-colors hover:text-brand-500">
+                    class="btn btn-secondary btn-sm">
               Edit
             </button>
             <% if (staff.role === 'admin') { %>
-              <form method="post" action="/plans/<%= p.id %>/remove"
-                    onsubmit="return confirm('Deactivate this plan?\nExisting subscriptions keep their dates; it can no longer be chosen for new ones.')">
-                <button type="submit" class="text-xs font-medium text-zinc-600 transition-colors hover:text-zinc-400">Deactivate</button>
-              </form>
+              <button type="button"
+                      data-deactivate-plan
+                      data-id="<%= p.id %>"
+                      data-name="<%= p.name %>"
+                      data-usage="<%= p.usage %>"
+                      class="btn btn-danger btn-sm">
+                Deactivate
+              </button>
             <% } %>
           </div>
         </div>
@@ -76,37 +74,59 @@
   // with the submitted values, so JS only handles the happy path.
   document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('plan-form-modal')
-    if (!modal) return
-    const formEl = modal.querySelector('form')
-    const title = modal.querySelector('[data-plan-form-title]')
-    const field = (n) => formEl.querySelector('[name="' + n + '"]')
+    if (modal) {
+      const formEl = modal.querySelector('form')
+      const title = modal.querySelector('[data-plan-form-title]')
+      const field = (n) => formEl.querySelector('[name="' + n + '"]')
 
-    const useCreateMode = () => {
-      formEl.reset()
-      formEl.action = '/plans'
-      title.textContent = 'Add plan'
+      const useCreateMode = () => {
+        formEl.reset()
+        formEl.action = '/plans'
+        title.textContent = 'Add plan'
+      }
+
+      document.querySelectorAll('[data-add-plan]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          useCreateMode()
+          openModal(modal)
+        })
+      })
+
+      document.querySelectorAll('[data-edit-plan]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const d = btn.dataset
+          formEl.action = '/plans/' + d.id
+          title.textContent = 'Edit plan'
+          field('name').value = d.name
+          field('description').value = d.description
+          field('price').value = d.price
+          field('duration_value').value = d.durationValue
+          field('duration_unit').value = d.durationUnit
+          field('max_visits_per_period').value = d.maxVisits
+          openModal(modal)
+        })
+      })
     }
 
-    document.querySelectorAll('[data-add-plan]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        useCreateMode()
-        openModal(modal)
-      })
-    })
+    // Deactivate confirmation — point the modal form at the chosen plan.
+    const deactivateModal = document.getElementById('deactivate-plan-modal')
+    if (deactivateModal) {
+      const deactivateForm = deactivateModal.querySelector('form')
+      const deactivateName = deactivateModal.querySelector('[data-deactivate-name]')
+      const deactivateUsage = deactivateModal.querySelector('[data-deactivate-usage]')
 
-    document.querySelectorAll('[data-edit-plan]').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const d = btn.dataset
-        formEl.action = '/plans/' + d.id
-        title.textContent = 'Edit plan'
-        field('name').value = d.name
-        field('description').value = d.description
-        field('price').value = d.price
-        field('duration_value').value = d.durationValue
-        field('duration_unit').value = d.durationUnit
-        field('max_visits_per_period').value = d.maxVisits
-        openModal(modal)
+      document.querySelectorAll('[data-deactivate-plan]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const d = btn.dataset
+          const usage = Number(d.usage || '0')
+          deactivateForm.action = '/plans/' + d.id + '/remove'
+          deactivateName.textContent = d.name
+          deactivateUsage.textContent = usage === 0
+            ? 'No subscriptions use this plan yet.'
+            : usage + ' subscription' + (usage === 1 ? '' : 's') + ' currently use this plan — their dates and prices stay unchanged.'
+          openModal(deactivateModal)
+        })
       })
-    })
+    }
   })
 </script>
