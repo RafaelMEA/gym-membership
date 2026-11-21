@@ -17,37 +17,37 @@
  * everywhere.
  */
 
-export type DurationUnit = 'day' | 'week' | 'month' | 'year'
+export type DurationUnit = "day" | "week" | "month" | "year";
 
 export interface IsoDate {
-  year: number
-  month: number // 1-12
-  day: number // 1-31
+  year: number;
+  month: number; // 1-12
+  day: number; // 1-31
 }
 
 /** Parse 'YYYY-MM-DD' into its parts. Throws on anything malformed. */
 export function parseIsoDate(value: string): IsoDate {
-  const parts = value.split('-')
+  const parts = value.split("-");
   if (parts.length !== 3) {
-    throw new Error(`Invalid ISO date "${value}" — expected YYYY-MM-DD`)
+    throw new Error(`Invalid ISO date "${value}" — expected YYYY-MM-DD`);
   }
-  const [y, m, d] = parts.map(Number)
+  const [y, m, d] = parts.map(Number);
   if (y === undefined || m === undefined || d === undefined) {
-    throw new Error(`Invalid ISO date "${value}" — expected YYYY-MM-DD`)
+    throw new Error(`Invalid ISO date "${value}" — expected YYYY-MM-DD`);
   }
-  return { year: y, month: m, day: d }
+  return { year: y, month: m, day: d };
 }
 
 /** Format parts back into 'YYYY-MM-DD'. */
 export function formatIsoDate({ year, month, day }: IsoDate): string {
-  const pad = (n: number) => String(n).padStart(2, '0')
-  return `${year}-${pad(month)}-${pad(day)}`
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${year}-${pad(month)}-${pad(day)}`;
 }
 
 /** Number of days in a given month. month is 1-12. */
 export function daysInMonth(year: number, month: number): number {
   // Day 0 of the next month is the last day of this month.
-  return new Date(Date.UTC(year, month, 0)).getUTCDate()
+  return new Date(Date.UTC(year, month, 0)).getUTCDate();
 }
 
 /**
@@ -56,35 +56,44 @@ export function daysInMonth(year: number, month: number): number {
  *   addDuration('2026-01-31', 1, 'month') === '2026-02-28'
  *   addDuration('2028-02-29', 1, 'year')  === '2029-02-28'
  */
-export function addDuration(start: string, value: number, unit: DurationUnit): string {
-  const { year, month, day } = parseIsoDate(start)
+export function addDuration(
+  start: string,
+  value: number,
+  unit: DurationUnit,
+): string {
+  const { year, month, day } = parseIsoDate(start);
 
-  if (unit === 'day' || unit === 'week') {
-    const days = unit === 'week' ? value * 7 : value
-    const dt = new Date(Date.UTC(year, month - 1, day))
-    dt.setUTCDate(dt.getUTCDate() + days)
-    return dt.toISOString().slice(0, 10)
+  if (unit === "day" || unit === "week") {
+    const days = unit === "week" ? value * 7 : value;
+    const dt = new Date(Date.UTC(year, month - 1, day));
+    dt.setUTCDate(dt.getUTCDate() + days);
+    return dt.toISOString().slice(0, 10);
   }
 
   // month / year — work out the target year+month, then clamp the day.
-  let targetYear = year
-  let targetMonth = month
-  if (unit === 'month') {
-    const totalMonths = year * 12 + (month - 1) + value
-    targetYear = Math.floor(totalMonths / 12)
-    targetMonth = (totalMonths % 12) + 1
+  let targetYear = year;
+  let targetMonth = month;
+  if (unit === "month") {
+    const totalMonths = year * 12 + (month - 1) + value;
+    targetYear = Math.floor(totalMonths / 12);
+    targetMonth = (totalMonths % 12) + 1;
   } else {
-    targetYear = year + value
+    targetYear = year + value;
   }
 
-  const clampedDay = Math.min(day, daysInMonth(targetYear, targetMonth))
-  return formatIsoDate({ year: targetYear, month: targetMonth, day: clampedDay })
+  const clampedDay = Math.min(day, daysInMonth(targetYear, targetMonth));
+  return formatIsoDate({
+    year: targetYear,
+    month: targetMonth,
+    day: clampedDay,
+  });
 }
 
 /** Whole days from `from` to `to` (positive when `to` is later). */
 export function daysBetween(from: string, to: string): number {
-  const a = parseIsoDate(from)
-  const b = parseIsoDate(to)
-  const ms = Date.UTC(b.year, b.month - 1, b.day) - Date.UTC(a.year, a.month - 1, a.day)
-  return Math.round(ms / 86_400_000)
+  const a = parseIsoDate(from);
+  const b = parseIsoDate(to);
+  const ms =
+    Date.UTC(b.year, b.month - 1, b.day) - Date.UTC(a.year, a.month - 1, a.day);
+  return Math.round(ms / 86_400_000);
 }
