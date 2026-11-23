@@ -26,34 +26,43 @@
     : '?'
 %>
 
-<aside class="fixed inset-y-0 left-0 z-40 hidden w-64 flex-col border-r border-line bg-panel md:flex">
+<!-- Backdrop for the mobile navigation drawer -->
+<div data-nav-backdrop aria-hidden="true"
+     class="nav-backdrop fixed inset-0 z-40 bg-black/70 backdrop-blur-sm md:hidden"></div>
+
+<aside id="main-sidebar" data-nav-panel aria-label="Main navigation"
+       class="nav-drawer fixed inset-y-0 left-0 z-50 flex w-72 max-w-[85vw] flex-col border-r border-line bg-panel shadow-2xl shadow-black/50 md:z-40 md:w-64 md:max-w-none md:shadow-none">
   <!-- Brand -->
-  <div class="flex h-16 items-center gap-3 border-b border-line px-5">
-    <img src="/assets/logo.jpeg" alt="ARMZTRONG GYM logo" class="h-10 w-10 rounded-lg object-cover ring-1 ring-line">
-    <div class="leading-tight">
-      <p class="font-display text-xl tracking-wide text-white">ARMZTRONG <span class="text-brand-500">GYM</span></p>
-      <p class="text-[11px] text-zinc-500">General Luna Branch</p>
+  <div class="flex h-16 items-center gap-3 border-b border-line px-4 md:px-5">
+    <img src="/assets/logo.jpeg" alt="ARMZTRONG GYM logo" width="447" height="447" decoding="async" class="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-line md:h-10 md:w-10">
+    <div class="min-w-0 leading-tight">
+      <p class="font-display text-lg tracking-wide text-white md:text-xl">ARMZTRONG <span class="text-brand-500">GYM</span></p>
+      <p class="truncate text-[11px] text-zinc-500">General Luna Branch</p>
     </div>
+    <button type="button" data-close-nav aria-label="Close menu"
+            class="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-line bg-panel-2 text-zinc-400 transition-colors hover:border-brand-600/60 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50 md:hidden">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true" focusable="false"><path d="M18 6 6 18M6 6l12 12"/></svg>
+    </button>
   </div>
 
   <!-- Navigation -->
-  <nav class="flex-1 space-y-1 px-3 py-4">
+  <nav class="flex-1 space-y-1 overflow-y-auto px-3 py-4">
     <% nav.forEach((item) => { %>
       <% if (item.soon) { %>
         <span title="Coming soon"
               class="flex cursor-not-allowed select-none items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-zinc-700"><%- icons[item.key] %></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-zinc-700" aria-hidden="true" focusable="false"><%- icons[item.key] %></svg>
           <span class="flex-1"><%= item.label %></span>
           <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-zinc-500">SOON</span>
         </span>
       <% } else { %>
-        <a href="<%= item.href %>"
-           class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors
+        <a href="<%= item.href %>"<% if (item.key === activeNav) { %> aria-current="page"<% } %>
+           class="flex items-center gap-3 rounded-lg px-3 py-3 text-sm font-medium transition-colors md:py-2
                   <%= item.key === activeNav
                         ? 'bg-brand-600/15 text-white ring-1 ring-brand-600/40'
                         : 'text-zinc-400 hover:bg-panel-2 hover:text-zinc-200' %>">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-               class="h-5 w-5 <%= item.key === activeNav ? 'text-brand-500' : 'text-zinc-500' %>"><%- icons[item.key] %></svg>
+               class="h-5 w-5 <%= item.key === activeNav ? 'text-brand-500' : 'text-zinc-500' %>" aria-hidden="true" focusable="false"><%- icons[item.key] %></svg>
           <span><%= item.label %></span>
         </a>
       <% } %>
@@ -71,16 +80,20 @@
     </div>
     <form method="post" action="/logout">
       <button type="submit"
-              class="mt-2 flex w-full items-center gap-3 rounded-lg border border-line bg-panel-2 px-3 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-brand-700 hover:text-brand-400">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-zinc-500"><%- icons.logout %></svg>
+              class="mt-2 flex w-full items-center gap-3 rounded-lg border border-line bg-panel-2 px-3 py-3 text-sm font-medium text-zinc-400 transition-colors hover:border-brand-700 hover:text-brand-400 md:py-2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-zinc-500" aria-hidden="true" focusable="false"><%- icons.logout %></svg>
         Sign out
       </button>
     </form>
   </div>
 </aside>
 
-<!-- Mobile top bar (sidebar is desktop-only for now) -->
-<div class="sticky top-0 z-40 flex h-14 items-center gap-3 border-b border-line bg-panel/95 px-4 backdrop-blur md:hidden">
-  <img src="/assets/logo.jpeg" alt="ARMZTRONG GYM logo" class="h-8 w-8 rounded-md object-cover ring-1 ring-line">
+<!-- Mobile top bar -->
+<div class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-line bg-panel/95 px-3 backdrop-blur md:hidden">
+  <button type="button" data-open-nav aria-controls="main-sidebar" aria-expanded="false" aria-label="Open menu"
+          class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-line bg-panel-2 text-zinc-300 transition-colors hover:border-brand-600/60 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5" aria-hidden="true" focusable="false"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+  </button>
+  <img src="/assets/logo.jpeg" alt="ARMZTRONG GYM logo" width="447" height="447" decoding="async" class="h-8 w-8 rounded-md object-cover ring-1 ring-line">
   <p class="font-display text-lg tracking-wide text-white">ARMZTRONG <span class="text-brand-500">GYM</span></p>
 </div>

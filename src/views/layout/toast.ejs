@@ -7,7 +7,7 @@
 %>
 
 <% if (hasToast) { %>
-  <div class="pointer-events-none fixed inset-x-4 top-4 z-[60] flex justify-end sm:left-auto sm:right-6 sm:top-6">
+  <div data-toast-layer class="pointer-events-none fixed inset-x-4 top-20 z-[60] flex justify-end sm:left-auto sm:right-6 md:top-6">
     <div data-toast
          role="status" aria-live="polite"
          class="toast-enter pointer-events-auto w-full max-w-sm overflow-hidden rounded-xl border bg-panel/95 shadow-2xl shadow-black/60 backdrop-blur
@@ -17,11 +17,11 @@
         <span class="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full
                      <%= isSuccess ? 'bg-emerald-500/15 text-emerald-400' : 'bg-brand-600/15 text-brand-400' %>">
           <% if (isSuccess) { %>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true" focusable="false">
               <path d="M20 6L9 17l-5-5"/>
             </svg>
           <% } else { %>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4" aria-hidden="true" focusable="false">
               <path d="M12 8v5M12 16.5v.5"/><circle cx="12" cy="12" r="9"/>
             </svg>
           <% } %>
@@ -31,7 +31,7 @@
 
         <button type="button" data-dismiss-toast aria-label="Dismiss notification"
                 class="-mr-1 shrink-0 rounded-md p-1 text-zinc-600 transition-colors hover:bg-panel-2 hover:text-zinc-300">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-4 w-4">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-4 w-4" aria-hidden="true" focusable="false">
             <path d="M6 6l12 12M18 6L6 18"/>
           </svg>
         </button>

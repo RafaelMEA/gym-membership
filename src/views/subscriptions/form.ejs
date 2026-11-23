@@ -6,17 +6,18 @@
 %>
 
 <div id="subscription-form-modal" data-modal class="fixed inset-0 z-50 <%= form.open ? 'flex' : 'hidden' %> items-center justify-center p-4">
-  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close-modal></div>
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close-modal aria-hidden="true"></div>
 
-  <div class="relative w-full max-w-lg rounded-2xl border border-line bg-panel shadow-2xl">
+  <div data-modal-panel role="dialog" aria-modal="true" aria-labelledby="subscription-form-title"
+       class="relative w-full max-w-lg rounded-2xl border border-line bg-panel shadow-2xl">
     <header class="flex items-start justify-between border-b border-line px-6 py-4">
       <div>
-        <h2 class="font-display text-2xl tracking-wide text-white">New subscription</h2>
+        <h2 id="subscription-form-title" class="font-display text-2xl tracking-wide text-white">New subscription</h2>
         <p class="mt-0.5 text-xs text-zinc-500">The end date is computed automatically from the plan.</p>
       </div>
       <button type="button" data-close-modal aria-label="Close"
-              class="rounded-lg p-1.5 text-zinc-500 transition-colors hover:bg-panel-2 hover:text-zinc-300">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5"><path d="M6 6l12 12M18 6L6 18"/></svg>
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </header>
 

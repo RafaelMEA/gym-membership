@@ -88,7 +88,7 @@
       document.querySelectorAll('[data-add-plan]').forEach((btn) => {
         btn.addEventListener('click', () => {
           useCreateMode()
-          openModal(modal)
+          openModal(modal, btn)
         })
       })
 
@@ -103,7 +103,7 @@
           field('duration_value').value = d.durationValue
           field('duration_unit').value = d.durationUnit
           field('max_visits_per_period').value = d.maxVisits
-          openModal(modal)
+          openModal(modal, btn)
         })
       })
     }
@@ -124,7 +124,7 @@
           deactivateUsage.textContent = usage === 0
             ? 'No subscriptions use this plan yet.'
             : usage + ' subscription' + (usage === 1 ? '' : 's') + ' currently use this plan — their dates and prices stay unchanged.'
-          openModal(deactivateModal)
+          openModal(deactivateModal, btn)
         })
       })
     }
