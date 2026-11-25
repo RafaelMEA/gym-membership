@@ -2,7 +2,7 @@
   // New-subscription modal — included by subscriptions/list.ejs.
   // `form` (SubscriptionFormState) carries values, errors and options.
   const labelCls = 'block text-xs font-semibold uppercase tracking-wider text-zinc-400'
-  const inputCls = 'mt-1.5 w-full rounded-lg border bg-panel px-3.5 py-2.5 text-sm text-white outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-600/30'
+  const inputCls = 'mt-1.5 w-full rounded-lg border bg-panel px-3.5 py-2.5 text-sm text-white outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30'
 %>
 
 <div id="subscription-form-modal" data-modal class="fixed inset-0 z-50 <%= form.open ? 'flex' : 'hidden' %> items-center justify-center p-4">

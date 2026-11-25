@@ -148,12 +148,37 @@
 }
 
 /* ============================================================
+   Skip link
+   Hidden off-screen until it receives keyboard focus.
+   ============================================================ */
+.skip-link {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 70;
+  transform: translateY(-200%);
+  border-radius: 0.5rem;
+  background-color: var(--color-brand-600);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none;
+  outline: 2px solid rgb(255 255 255 / 0.6);
+  outline-offset: 2px;
+}
+
+/* ============================================================
    Buttons
    Shared classes so every action reads as a control, not a link.
    ============================================================ */
 @layer components {
   .btn {
-    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-brand-600/50 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply inline-flex items-center justify-center gap-1.5 rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50 disabled:cursor-not-allowed disabled:opacity-60;
   }
 
   .btn-primary {

@@ -38,13 +38,13 @@
         <h2 class="font-display text-xl tracking-wide text-white">Check in</h2>
         <p class="mt-0.5 text-xs text-zinc-600">Members with a running subscription can be checked in.</p>
       </div>
-      <span id="directory-count" data-live-sync aria-live="polite" class="shrink-0 text-xs text-zinc-600"><%= directory.length %> shown</span>
+      <span id="directory-count" data-live-sync role="status" aria-live="polite" class="shrink-0 text-xs text-zinc-600"><%= directory.length %> shown</span>
     </header>
 
     <form method="get" action="/attendance" data-live-search class="flex gap-2 border-b border-line px-5 py-3">
       <input type="search" name="q" value="<%= q %>" placeholder="Search name or membership no…"
              autocomplete="off" spellcheck="false"
-             class="w-full rounded-lg border border-line bg-panel-2 px-3.5 py-2 text-sm text-white placeholder-zinc-600 outline-none transition focus:border-brand-600 focus:ring-2 focus:ring-brand-600/30">
+             class="w-full rounded-lg border border-line bg-panel-2 px-3.5 py-2 text-sm text-white placeholder-zinc-600 outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30">
       <button type="submit" class="rounded-lg border border-line bg-panel-2 px-4 text-sm font-medium text-zinc-300 transition-colors hover:border-brand-600/60 hover:text-white disabled:cursor-not-allowed disabled:opacity-50">Search</button>
       <a href="/attendance" data-live-clear class="btn btn-secondary<%= q ? '' : ' hidden' %>">Clear</a>
     </form>
