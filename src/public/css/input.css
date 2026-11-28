@@ -21,6 +21,10 @@
   --color-panel: #121216;
   --color-panel-2: #17171c;
   --color-line: #26262c;
+
+  /* Muted text: both tiers clear WCAG AA (4.5:1) on ink/panel/panel-2 */
+  --color-muted: #a1a1aa;
+  --color-faint: #8b8b95;
 }
 
 /* Base polish */
@@ -172,6 +176,12 @@
   outline-offset: 2px;
 }
 
+/* Keep a visible focus indicator when the skip link focuses main. */
+#main-content:focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: -2px;
+}
+
 /* ============================================================
    Buttons
    Shared classes so every action reads as a control, not a link.
@@ -195,6 +205,6 @@
 
   /* Compact variant for table rows and card footers */
   .btn-sm {
-    @apply gap-1 px-3 py-1.5 text-xs font-medium;
+    @apply min-h-8 min-w-8 gap-1 px-3 py-1.5 text-xs font-medium;
   }
 }

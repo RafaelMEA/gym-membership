@@ -3,6 +3,10 @@
   // `form` (SubscriptionFormState) carries values, errors and options.
   const labelCls = 'block text-xs font-semibold uppercase tracking-wider text-zinc-400'
   const inputCls = 'mt-1.5 w-full rounded-lg border bg-panel px-3.5 py-2.5 text-sm text-white outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30'
+  // Wires each field error to its control for assistive tech.
+  const errorAttrs = (field, id) => (form.fieldErrors[field] ? `aria-invalid="true" aria-describedby="${id}-error"` : '')
+  const noMembers = form.options.members.length === 0
+  const noPlans = form.options.plans.length === 0
 %>
 
 <div id="subscription-form-modal" data-modal class="fixed inset-0 z-50 <%= form.open ? 'flex' : 'hidden' %> items-center justify-center p-4">
@@ -13,10 +17,10 @@
     <header class="flex items-start justify-between border-b border-line px-6 py-4">
       <div>
         <h2 id="subscription-form-title" class="font-display text-2xl tracking-wide text-white">New subscription</h2>
-        <p class="mt-0.5 text-xs text-zinc-500">The end date is computed automatically from the plan.</p>
+        <p class="mt-0.5 text-xs text-muted">The end date is computed automatically from the plan.</p>
       </div>
       <button type="button" data-close-modal aria-label="Close"
-              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </header>
@@ -28,57 +32,69 @@
         </div>
       <% } %>
 
+      <% if (noMembers || noPlans) { %>
+        <div class="mb-4 rounded-lg border border-line bg-panel-2 px-4 py-3 text-xs leading-relaxed text-zinc-400" role="alert">
+          <% if (noMembers && noPlans) { %>
+            Add a <a href="/members" class="text-brand-400 hover:text-brand-300">member</a> and a <a href="/plans" class="text-brand-400 hover:text-brand-300">plan</a> before creating a subscription.
+          <% } else if (noMembers) { %>
+            Add a <a href="/members" class="text-brand-400 hover:text-brand-300">member</a> before creating a subscription.
+          <% } else { %>
+            Add a <a href="/plans" class="text-brand-400 hover:text-brand-300">plan</a> before creating a subscription.
+          <% } %>
+        </div>
+      <% } %>
+
       <div>
         <label for="sf-member" class="<%= labelCls %>">Member</label>
         <select id="sf-member" name="member_id" required
-                class="<%= inputCls %> <%= form.fieldErrors.member_id ? 'border-brand-600' : 'border-line' %>">
+                class="<%= inputCls %> <%= form.fieldErrors.member_id ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('member_id', 'sf-member') %>>
           <option value="" <%= form.values.member_id === '' ? 'selected' : '' %> disabled>Select a member…</option>
           <% form.options.members.forEach((m) => { %>
             <option value="<%= m.id %>" <%= form.values.member_id === String(m.id) ? 'selected' : '' %>><%= m.name %></option>
           <% }) %>
         </select>
         <% if (form.fieldErrors.member_id) { %>
-          <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.member_id %></p>
+          <p id="sf-member-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.member_id %></p>
         <% } %>
       </div>
 
       <div class="mt-4">
         <label for="sf-plan" class="<%= labelCls %>">Plan</label>
         <select id="sf-plan" name="plan_id" required
-                class="<%= inputCls %> <%= form.fieldErrors.plan_id ? 'border-brand-600' : 'border-line' %>">
+                class="<%= inputCls %> <%= form.fieldErrors.plan_id ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('plan_id', 'sf-plan') %>>
           <option value="" <%= form.values.plan_id === '' ? 'selected' : '' %> disabled>Select a plan…</option>
           <% form.options.plans.forEach((p) => { %>
             <option value="<%= p.id %>" <%= form.values.plan_id === String(p.id) ? 'selected' : '' %>><%= p.label %></option>
           <% }) %>
         </select>
         <% if (form.fieldErrors.plan_id) { %>
-          <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.plan_id %></p>
+          <p id="sf-plan-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.plan_id %></p>
         <% } %>
       </div>
 
       <div class="mt-4">
         <label for="sf-start" class="<%= labelCls %>">Start date</label>
         <input id="sf-start" name="start_date" type="date" value="<%= form.values.start_date || form.options.today %>"
-               class="<%= inputCls %> <%= form.fieldErrors.start_date ? 'border-brand-600' : 'border-line' %>">
+               class="<%= inputCls %> <%= form.fieldErrors.start_date ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('start_date', 'sf-start') %>>
         <% if (form.fieldErrors.start_date) { %>
-          <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.start_date %></p>
+          <p id="sf-start-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.start_date %></p>
         <% } %>
-        <p class="mt-1 text-xs text-zinc-600">Periods that overlap an existing subscription are rejected.</p>
+        <p class="mt-1 text-xs text-faint">Periods that overlap an existing subscription are rejected.</p>
       </div>
 
       <label class="mt-4 flex items-start gap-3 rounded-lg border border-line bg-panel-2 px-3.5 py-3">
         <input type="checkbox" name="auto_renew" class="mt-0.5 h-4 w-4 accent-brand-600" <%= form.values.auto_renew ? 'checked' : '' %>>
         <span>
           <span class="block text-sm text-zinc-200">Mark as auto-renew</span>
-          <span class="text-xs text-zinc-500">Recorded on the subscription — renewal payments are still entered manually.</span>
+          <span class="text-xs text-muted">Recorded on the subscription — renewal payments are still entered manually.</span>
         </span>
       </label>
 
       <div class="mt-6 flex justify-end gap-2 border-t border-line pt-4">
         <button type="button" data-close-modal
                 class="btn btn-secondary">Cancel</button>
-        <button type="submit"
-                class="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500">
+        <button type="submit" <%= (noMembers || noPlans) ? 'disabled' : '' %>
+                class="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60">
           Create subscription
         </button>
       </div>

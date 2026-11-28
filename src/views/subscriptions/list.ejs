@@ -2,7 +2,7 @@
 <div class="flex flex-wrap items-end justify-between gap-4">
   <div>
     <h1 class="font-display text-4xl tracking-wide text-white">Subscriptions</h1>
-    <p class="mt-1 text-sm text-zinc-500">End dates are derived from the plan — billing and audit history is preserved.</p>
+    <p class="mt-1 text-sm text-muted">End dates are derived from the plan — billing and audit history is preserved.</p>
   </div>
   <button type="button" data-open-modal="#subscription-form-modal"
           class="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500">
@@ -26,7 +26,7 @@
                     ? 'border-brand-600/60 bg-brand-600/15 text-white'
                     : 'border-line bg-panel text-zinc-400 hover:text-zinc-200' %>">
       <%= t.label %>
-      <span class="ml-1.5 rounded px-1.5 py-0.5 text-[10px] font-semibold <%= status === t.key ? 'bg-brand-600/30 text-brand-300' : 'bg-zinc-800 text-zinc-500' %>"><%= t.count %></span>
+      <span class="ml-1.5 rounded px-1.5 py-0.5 text-[10px] font-semibold <%= status === t.key ? 'bg-brand-600/30 text-brand-300' : 'bg-zinc-800 text-muted' %>"><%= t.count %></span>
     </a>
   <% }) %>
 </div>
@@ -38,13 +38,13 @@
     <% if (subscriptions.length === 0) { %>
       <div class="px-6 py-14 text-center">
         <p class="font-display text-2xl text-white">No subscriptions<%= status ? ` (${status})` : '' %> yet</p>
-        <p class="mt-1 text-sm text-zinc-500">Create one with the button above.</p>
+        <p class="mt-1 text-sm text-muted">Create one with the button above.</p>
       </div>
     <% } else { %>
       <div class="overflow-x-auto">
         <table class="w-full text-sm">
           <thead>
-            <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-zinc-600">
+            <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-faint">
               <th class="px-5 py-3 font-semibold">Member</th>
               <th class="px-5 py-3 font-semibold">Plan</th>
               <th class="px-5 py-3 font-semibold">Period</th>
@@ -56,10 +56,10 @@
             <% subscriptions.forEach((s) => { %>
               <tr class="transition-colors hover:bg-panel-2/60">
                 <td class="px-5 py-3">
-                  <a href="/members/<%= s.memberId %>" class="font-medium text-zinc-200 transition-colors hover:text-brand-400"><%= s.memberName %></a>
+                  <a href="/members/<%= s.memberId %>" class="block max-w-[12rem] truncate font-medium text-zinc-200 transition-colors hover:text-brand-400" title="<%= s.memberName %>"><%= s.memberName %></a>
                 </td>
-                <td class="px-5 py-3 text-zinc-400"><%= s.planName %></td>
-                <td class="px-5 py-3 text-zinc-500"><%= s.period %></td>
+                <td class="px-5 py-3 text-zinc-400"><span class="block max-w-[12rem] truncate" title="<%= s.planName %>"><%= s.planName %></span></td>
+                <td class="px-5 py-3 text-muted"><%= s.period %></td>
                 <td class="px-5 py-3">
                   <div class="flex flex-col items-start gap-1.5">
                     <span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold <%= s.chipClass %>"><%= s.statusLabel %></span>
@@ -73,7 +73,7 @@
                     <% } %>
                   </div>
                 </td>
-                <td class="hidden px-5 py-3 text-right text-zinc-500 md:table-cell"><%= s.autoRenew ? 'Yes' : '—' %></td>
+                <td class="hidden px-5 py-3 text-right text-muted md:table-cell"><%= s.autoRenew ? 'Yes' : '—' %></td>
               </tr>
             <% }) %>
           </tbody>
@@ -87,7 +87,7 @@
     <section class="overflow-hidden rounded-xl border border-line bg-panel">
       <img src="/assets/promo_2026.jpg" alt="ARMZTRONG GYM 2026 long-term promo poster" width="1122" height="1402" loading="lazy" decoding="async" class="w-full object-cover">
       <div class="p-4">
-        <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">2026 long-term promo</p>
+        <p class="text-xs font-semibold uppercase tracking-wider text-muted">2026 long-term promo</p>
         <p class="mt-1 text-xs leading-relaxed text-zinc-400">
           Standard package only · until December 31, 2026. E.g. 3 months ₱1,100 students / ₱1,350 regular · 1 year ₱3,900 / ₱4,900.
         </p>
@@ -101,7 +101,7 @@
         <li class="flex justify-between"><span>Monthly · students</span><span class="text-zinc-200">₱450</span></li>
         <li class="flex justify-between"><span>Monthly · regular</span><span class="text-zinc-200">₱550</span></li>
       </ul>
-      <p class="mt-4 border-t border-line pt-3 text-[11px] leading-relaxed text-zinc-600">
+      <p class="mt-4 border-t border-line pt-3 text-[11px] leading-relaxed text-faint">
         Plans in this system mirror these rates. Freeze and cancellation keep the subscription history intact.
       </p>
     </section>

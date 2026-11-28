@@ -1,4 +1,4 @@
-<a href="/members" class="inline-flex items-center gap-1.5 text-xs text-zinc-500 transition-colors hover:text-zinc-300">
+<a href="/members" class="inline-flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-zinc-300">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-3.5 w-3.5" aria-hidden="true" focusable="false"><path d="M15 18l-6-6 6-6"/></svg>
   All members
 </a>
@@ -10,9 +10,9 @@
     <div class="-mt-10 flex flex-wrap items-end justify-between gap-4">
       <div class="flex items-end gap-4">
         <span class="flex h-20 w-20 shrink-0 items-center justify-center rounded-2xl bg-brand-600/20 font-display text-3xl text-brand-400 ring-4 ring-panel"><%= member.initials %></span>
-        <div class="pb-1">
-          <h1 class="font-display text-3xl tracking-wide text-white"><%= member.name %></h1>
-          <p class="mt-0.5 text-xs text-zinc-500">
+        <div class="min-w-0 pb-1">
+          <h1 class="break-words font-display text-3xl tracking-wide text-white"><%= member.name %></h1>
+          <p class="mt-0.5 text-xs text-muted">
             Membership no. <span class="text-zinc-300"><%= member.membershipNo %></span>
             <% if (member.joined) { %> · joined <%= member.joined %><% } %>
           </p>
@@ -24,32 +24,30 @@
           Edit
         </button>
         <% if (staff.role === 'admin') { %>
-          <form method="post" action="/members/<%= member.id %>/remove"
-                onsubmit="return confirm('Deactivate <%= member.name %>?\\nTheir subscriptions, payments and attendance history stay intact.')">
-            <button type="submit"
-                    class="rounded-lg border border-line bg-panel-2 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-brand-700 hover:text-brand-400">
-              Deactivate
-            </button>
-          </form>
+          <button type="button" data-deactivate-member
+                  data-id="<%= member.id %>" data-name="<%= member.name %>"
+                  class="rounded-lg border border-line bg-panel-2 px-4 py-2 text-sm font-medium text-zinc-400 transition-colors hover:border-brand-700 hover:text-brand-400">
+            Deactivate
+          </button>
         <% } %>
       </div>
     </div>
 
     <dl class="mt-5 grid grid-cols-2 gap-4 text-sm sm:grid-cols-4">
       <div>
-        <dt class="text-xs uppercase tracking-wider text-zinc-600">Email</dt>
-        <dd class="mt-1 truncate text-zinc-300"><%= member.email %></dd>
+        <dt class="text-xs uppercase tracking-wider text-faint">Email</dt>
+        <dd class="mt-1 truncate text-zinc-300" title="<%= member.email %>"><%= member.email %></dd>
       </div>
       <div>
-        <dt class="text-xs uppercase tracking-wider text-zinc-600">Phone</dt>
-        <dd class="mt-1 text-zinc-300"><%= member.phone %></dd>
+        <dt class="text-xs uppercase tracking-wider text-faint">Phone</dt>
+        <dd class="mt-1 break-all text-zinc-300"><%= member.phone %></dd>
       </div>
       <div>
-        <dt class="text-xs uppercase tracking-wider text-zinc-600">Gender</dt>
+        <dt class="text-xs uppercase tracking-wider text-faint">Gender</dt>
         <dd class="mt-1 capitalize text-zinc-300"><%= member.gender %></dd>
       </div>
       <div>
-        <dt class="text-xs uppercase tracking-wider text-zinc-600">Status</dt>
+        <dt class="text-xs uppercase tracking-wider text-faint">Status</dt>
         <dd class="mt-1"><span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold <%= membership.chipClass %>"><%= membership.label %></span></dd>
       </div>
     </dl>
@@ -59,10 +57,10 @@
 <!-- Membership + stats -->
 <section class="mt-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
   <div class="rounded-xl border border-line bg-panel p-5 xl:col-span-2">
-    <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Membership</p>
+    <p class="text-xs font-semibold uppercase tracking-wider text-muted">Membership</p>
     <% if (membership.planName) { %>
-      <p class="mt-2 font-display text-2xl text-white"><%= membership.planName %></p>
-      <p class="mt-1 text-xs text-zinc-500"><%= membership.period %></p>
+      <p class="mt-2 break-words font-display text-2xl text-white"><%= membership.planName %></p>
+      <p class="mt-1 text-xs text-muted"><%= membership.period %></p>
       <% if (typeof membership.daysLeft === 'number') { %>
         <p class="mt-3">
           <span class="inline-flex whitespace-nowrap rounded-full px-2.5 py-1 text-[11px] font-semibold
@@ -75,24 +73,24 @@
       <% } %>
     <% } else { %>
       <p class="mt-2 font-display text-2xl text-zinc-400"><%= membership.label %></p>
-      <p class="mt-1 text-xs text-zinc-600">Create one from the subscriptions page</p>
+      <p class="mt-1 text-xs text-faint">Create one from the subscriptions page</p>
     <% } %>
   </div>
 
   <div class="rounded-xl border border-line bg-panel p-5">
-    <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Total visits</p>
+    <p class="text-xs font-semibold uppercase tracking-wider text-muted">Total visits</p>
     <p class="mt-2 font-display text-3xl text-white"><%= stats.visits %></p>
     <% if (stats.openVisits > 0) { %>
       <p class="mt-1 text-xs font-semibold text-brand-400"><%= stats.openVisits %> in gym right now</p>
     <% } else { %>
-      <p class="mt-1 text-xs text-zinc-600">none open</p>
+      <p class="mt-1 text-xs text-faint">none open</p>
     <% } %>
   </div>
 
   <div class="rounded-xl border border-line bg-panel p-5">
-    <p class="text-xs font-semibold uppercase tracking-wider text-zinc-500">Total paid</p>
+    <p class="text-xs font-semibold uppercase tracking-wider text-muted">Total paid</p>
     <p class="mt-2 font-display text-3xl text-white"><%= stats.totalPaid %></p>
-    <p class="mt-1 text-xs text-zinc-600">across <%= stats.subscriptions %> subscription<%= stats.subscriptions === 1 ? '' : 's' %></p>
+    <p class="mt-1 text-xs text-faint">across <%= stats.subscriptions %> subscription<%= stats.subscriptions === 1 ? '' : 's' %></p>
   </div>
 </section>
 
@@ -104,12 +102,12 @@
   </header>
 
   <% if (subscriptions.length === 0) { %>
-    <p class="px-5 py-10 text-center text-sm text-zinc-500">No subscriptions yet for this member.</p>
+    <p class="px-5 py-10 text-center text-sm text-muted">No subscriptions yet for this member.</p>
   <% } else { %>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-zinc-600">
+          <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-faint">
             <th class="px-5 py-3 font-semibold">Plan</th>
             <th class="px-5 py-3 font-semibold">Period</th>
             <th class="px-5 py-3 font-semibold">Status</th>
@@ -119,10 +117,10 @@
         <tbody class="divide-y divide-line">
           <% subscriptions.forEach((s) => { %>
             <tr class="transition-colors hover:bg-panel-2/60">
-              <td class="px-5 py-3 text-zinc-200"><%= s.planName %></td>
+              <td class="px-5 py-3 text-zinc-200"><span class="block max-w-[14rem] truncate" title="<%= s.planName %>"><%= s.planName %></span></td>
               <td class="px-5 py-3 text-zinc-400"><%= s.period %></td>
               <td class="px-5 py-3"><span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold <%= s.chipClass %>"><%= s.statusLabel %></span></td>
-              <td class="px-5 py-3 text-right text-zinc-500"><%= s.autoRenew ? 'Yes' : '—' %></td>
+              <td class="px-5 py-3 text-right text-muted"><%= s.autoRenew ? 'Yes' : '—' %></td>
             </tr>
           <% }) %>
         </tbody>
@@ -136,7 +134,7 @@
   <header class="flex flex-wrap items-center justify-between gap-3 border-b border-line px-5 py-4">
     <div>
       <h2 class="font-display text-xl tracking-wide text-white">Attendance</h2>
-      <p class="mt-0.5 text-xs text-zinc-600">Check-ins are marked on the calendar.</p>
+      <p class="mt-0.5 text-xs text-faint">Check-ins are marked on the calendar.</p>
     </div>
 
     <div class="flex items-center gap-2">
@@ -159,13 +157,13 @@
   </header>
 
   <div class="flex flex-wrap items-center justify-between gap-2 border-b border-line px-5 py-3">
-    <p class="text-xs text-zinc-500">
+    <p class="text-xs text-muted">
       <span class="font-semibold text-zinc-300"><%= calendar.visitsThisMonth %></span>
       visit<%= calendar.visitsThisMonth === 1 ? '' : 's' %> in <%= calendar.label %>
-      <span class="text-zinc-700">·</span>
+      <span class="text-faint">·</span>
       <%= stats.visits %> all-time
     </p>
-    <div class="flex items-center gap-3 text-[11px] text-zinc-600">
+    <div class="flex items-center gap-3 text-[11px] text-faint">
       <span class="flex items-center gap-1.5">
         <span class="flex h-4 w-4 items-center justify-center rounded-full bg-emerald-500/15 text-emerald-400 ring-1 ring-emerald-500/30">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="h-2.5 w-2.5" aria-hidden="true" focusable="false"><path d="M20 6L9 17l-5-5"/></svg>
@@ -182,7 +180,7 @@
   <div class="px-3 py-4 sm:px-5">
     <div class="grid grid-cols-7 gap-1 sm:gap-2">
       <% ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach((d) => { %>
-        <div class="pb-1 text-center text-[10px] font-semibold uppercase tracking-wider text-zinc-600 sm:text-[11px]"><%= d %></div>
+        <div class="pb-1 text-center text-[10px] font-semibold uppercase tracking-wider text-faint sm:text-[11px]"><%= d %></div>
       <% }) %>
     </div>
 
@@ -193,7 +191,7 @@
                     <%= d.inMonth ? 'border-line bg-panel-2/40' : 'border-transparent' %>
                     <%= d.isToday ? 'ring-1 ring-brand-600/60' : '' %>">
           <span class="text-[11px] font-medium sm:text-xs
-                       <%= !d.inMonth ? 'text-zinc-700' : d.isToday ? 'text-brand-400' : 'text-zinc-500' %>"><%= d.day %></span>
+                       <%= !d.inMonth ? 'text-faint' : d.isToday ? 'text-brand-400' : 'text-muted' %>"><%= d.day %></span>
 
           <% if (d.count > 0) { %>
             <div class="mt-1.5 flex items-center gap-1 sm:gap-1.5">
@@ -215,15 +213,15 @@
 <section class="mt-6 overflow-hidden rounded-xl border border-line bg-panel">
   <header class="border-b border-line px-5 py-4">
     <h2 class="font-display text-xl tracking-wide text-white">Payments</h2>
-    <p class="mt-0.5 text-xs text-zinc-600">Most recent 10 of this member's payments</p>
+    <p class="mt-0.5 text-xs text-faint">Most recent 10 of this member's payments</p>
   </header>
   <% if (payments.length === 0) { %>
-    <p class="px-5 py-10 text-center text-sm text-zinc-500">No payments recorded yet.</p>
+    <p class="px-5 py-10 text-center text-sm text-muted">No payments recorded yet.</p>
   <% } else { %>
     <div class="overflow-x-auto">
       <table class="w-full text-sm">
         <thead>
-          <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-zinc-600">
+          <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-faint">
             <th class="px-5 py-3 font-semibold">Reference</th>
             <th class="px-5 py-3 font-semibold">Amount</th>
             <th class="px-5 py-3 font-semibold">Status</th>
@@ -233,7 +231,7 @@
         <tbody class="divide-y divide-line">
           <% payments.forEach((p) => { %>
             <tr class="transition-colors hover:bg-panel-2/60">
-              <td class="px-5 py-3 text-zinc-500"><%= p.referenceNo %></td>
+              <td class="px-5 py-3 text-muted"><span class="block max-w-[12rem] truncate" title="<%= p.referenceNo %>"><%= p.referenceNo %></span></td>
               <td class="px-5 py-3 font-medium text-zinc-200"><%= p.amount %></td>
               <td class="px-5 py-3"><span class="inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold <%= p.statusClass %>"><%= p.statusLabel %></span></td>
               <td class="hidden px-5 py-3 text-zinc-400 sm:table-cell"><%= p.paidAt %></td>
@@ -244,5 +242,68 @@
     </div>
   <% } %>
 </section>
+
+<!-- Deactivate confirmation — admin only; JS points the form at the member.
+     The name is inserted with textContent so quotes in a member name can
+     never break out into markup or script. -->
+<div id="deactivate-member-modal" data-modal class="fixed inset-0 z-50 hidden items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close-modal aria-hidden="true"></div>
+
+  <div data-modal-panel role="dialog" aria-modal="true" aria-labelledby="deactivate-member-title"
+       class="relative w-full max-w-md rounded-2xl border border-line bg-panel shadow-2xl">
+    <header class="flex items-start justify-between border-b border-line px-6 py-4">
+      <div class="flex items-start gap-3">
+        <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-600/15 text-brand-400">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5" aria-hidden="true" focusable="false">
+            <path d="M12 9v4M12 17v.5"/><path d="M10.3 3.9L2.6 17a2 2 0 0 0 1.7 3h15.4a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/>
+          </svg>
+        </span>
+        <div>
+          <h2 id="deactivate-member-title" class="font-display text-2xl tracking-wide text-white">Deactivate member</h2>
+          <p class="mt-0.5 text-xs text-muted">Their billing and visit history stays intact.</p>
+        </div>
+      </div>
+      <button type="button" data-close-modal aria-label="Close"
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
+      </button>
+    </header>
+
+    <form method="post" action="" class="px-6 py-5">
+      <p class="break-words text-sm text-zinc-300">
+        Deactivate <span class="font-semibold text-white" data-deactivate-name>this member</span>?
+      </p>
+      <p class="mt-3 rounded-lg border border-line bg-panel-2 px-4 py-3 text-xs leading-relaxed text-muted">
+        They disappear from the front-desk directory, but subscriptions, payments and visits remain in the records.
+      </p>
+      <div class="mt-6 flex justify-end gap-2 border-t border-line pt-4">
+        <button type="button" data-close-modal data-initial-focus class="btn btn-secondary">Cancel</button>
+        <button type="submit" class="btn btn-primary">Deactivate member</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<noscript>
+  <form method="post" action="/members/<%= member.id %>/remove" class="mt-6">
+    <button type="submit" class="btn btn-danger">Deactivate member</button>
+  </form>
+</noscript>
+
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const modal = document.getElementById('deactivate-member-modal')
+    const form = modal && modal.querySelector('form')
+    const label = modal && modal.querySelector('[data-deactivate-name]')
+    document.querySelectorAll('[data-deactivate-member]').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        if (!form || !label) return
+        form.action = '/members/' + btn.dataset.id + '/remove'
+        label.textContent = btn.dataset.name || 'this member'
+        openModal(modal, btn)
+      })
+    })
+  })
+</script>
 
 <%- include('form.ejs', { form: editForm }) %>

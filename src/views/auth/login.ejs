@@ -34,7 +34,7 @@
           <p class="mt-4 max-w-md text-sm text-zinc-300">
             As low as ₱50 per session · ₱450 per month for students · ₱550 for regular members.
           </p>
-          <p class="mt-2 max-w-md text-xs text-zinc-500">Lower General Luna Road (below Mang Inasal)</p>
+          <p class="mt-2 max-w-md text-xs text-muted">Lower General Luna Road (below Mang Inasal)</p>
         </div>
       </div>
     </div>
@@ -49,19 +49,19 @@
         </div>
 
         <h1 class="font-display text-3xl text-white">Staff sign in</h1>
-        <p class="mt-1 text-sm text-zinc-500">Use your staff account to manage the gym.</p>
+        <p class="mt-1 text-sm text-muted">Use your staff account to manage the gym.</p>
 
         <form method="post" action="/login" class="mt-6 space-y-4">
           <div>
             <label for="email" class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Email</label>
-            <input id="email" name="email" type="email" required autocomplete="email" placeholder="you@example.com"
-                   class="mt-1.5 w-full rounded-lg border border-line bg-panel px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30">
+            <input id="email" name="email" type="email" value="<%= email %>" required maxlength="254" autocomplete="email" placeholder="you@example.com"
+                   class="mt-1.5 w-full rounded-lg border border-line bg-panel px-3.5 py-2.5 text-sm text-white placeholder-faint outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30">
           </div>
 
           <div>
             <label for="password" class="block text-xs font-semibold uppercase tracking-wider text-zinc-400">Password</label>
-            <input id="password" name="password" type="password" required autocomplete="current-password" placeholder="••••••••"
-                   class="mt-1.5 w-full rounded-lg border border-line bg-panel px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30">
+            <input id="password" name="password" type="password" required maxlength="72" autocomplete="current-password" placeholder="••••••••"
+                   class="mt-1.5 w-full rounded-lg border border-line bg-panel px-3.5 py-2.5 text-sm text-white placeholder-faint outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30">
           </div>
 
           <button type="submit"
@@ -70,7 +70,7 @@
           </button>
         </form>
 
-        <p class="mt-6 text-[11px] leading-relaxed text-zinc-600">
+        <p class="mt-6 text-[11px] leading-relaxed text-faint">
           Memberships, payments and attendance — managed in one place.
         </p>
       </div>

@@ -4,12 +4,12 @@ const paymentMethod = z.enum(["cash", "card", "transfer", "online"]);
 const paymentStatus = z.enum(["paid", "pending", "failed", "refunded"]);
 
 export const createPaymentSchema = z.object({
-  subscription_id: z.coerce.number().int().positive(),
-  amount: z.coerce.number().positive(),
+  subscription_id: z.coerce.number('Choose a subscription').int().positive('Choose a subscription'),
+  amount: z.coerce.number('Enter a valid amount').positive('Amount must be greater than zero'),
   method: paymentMethod,
   status: paymentStatus.default("paid"),
   paid_at: z.iso.date().optional(),
-  notes: z.string().trim().max(255).optional(),
+  notes: z.string().trim().max(255, 'Use 255 characters or fewer').optional(),
 });
 
 export const updatePaymentSchema = z

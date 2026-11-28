@@ -37,7 +37,7 @@
     <img src="/assets/logo.jpeg" alt="ARMZTRONG GYM logo" width="447" height="447" decoding="async" class="h-9 w-9 shrink-0 rounded-lg object-cover ring-1 ring-line md:h-10 md:w-10">
     <div class="min-w-0 leading-tight">
       <p class="font-display text-lg tracking-wide text-white md:text-xl">ARMZTRONG <span class="text-brand-500">GYM</span></p>
-      <p class="truncate text-[11px] text-zinc-500">General Luna Branch</p>
+      <p class="truncate text-[11px] text-muted">General Luna Branch</p>
     </div>
     <button type="button" data-close-nav aria-label="Close menu"
             class="ml-auto flex h-11 w-11 shrink-0 items-center justify-center rounded-lg border border-line bg-panel-2 text-zinc-400 transition-colors hover:border-brand-600/60 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50 md:hidden">
@@ -50,10 +50,10 @@
     <% nav.forEach((item) => { %>
       <% if (item.soon) { %>
         <span title="Coming soon"
-              class="flex cursor-not-allowed select-none items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-zinc-600">
+              class="flex cursor-not-allowed select-none items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-faint">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-zinc-700" aria-hidden="true" focusable="false"><%- icons[item.key] %></svg>
           <span class="flex-1"><%= item.label %></span>
-          <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-zinc-500">SOON</span>
+          <span class="rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-semibold tracking-wider text-muted">SOON</span>
         </span>
       <% } else { %>
         <a href="<%= item.href %>"<% if (item.key === activeNav) { %> aria-current="page"<% } %>
@@ -62,7 +62,7 @@
                         ? 'bg-brand-600/15 text-white ring-1 ring-brand-600/40'
                         : 'text-zinc-400 hover:bg-panel-2 hover:text-zinc-200' %>">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"
-               class="h-5 w-5 <%= item.key === activeNav ? 'text-brand-500' : 'text-zinc-500' %>" aria-hidden="true" focusable="false"><%- icons[item.key] %></svg>
+               class="h-5 w-5 <%= item.key === activeNav ? 'text-brand-500' : 'text-muted' %>" aria-hidden="true" focusable="false"><%- icons[item.key] %></svg>
           <span><%= item.label %></span>
         </a>
       <% } %>
@@ -75,13 +75,13 @@
       <span class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600/20 text-sm font-semibold text-brand-400 ring-1 ring-brand-600/40"><%= initials %></span>
       <div class="min-w-0 flex-1">
         <p class="truncate text-sm font-medium text-zinc-200"><%= staff ? staff.full_name : '' %></p>
-        <p class="text-[11px] uppercase tracking-wider text-zinc-500"><%= staff ? staff.role : '' %></p>
+        <p class="text-[11px] uppercase tracking-wider text-muted"><%= staff ? staff.role : '' %></p>
       </div>
     </div>
     <form method="post" action="/logout">
       <button type="submit"
               class="mt-2 flex w-full items-center gap-3 rounded-lg border border-line bg-panel-2 px-3 py-3 text-sm font-medium text-zinc-400 transition-colors hover:border-brand-700 hover:text-brand-400 md:py-2">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-zinc-500" aria-hidden="true" focusable="false"><%- icons.logout %></svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="h-5 w-5 text-muted" aria-hidden="true" focusable="false"><%- icons.logout %></svg>
         Sign out
       </button>
     </form>

@@ -2,7 +2,9 @@
   // Shared member modal — included by list.ejs (create) and detail.ejs
   // (edit). `form` (FormState) decides action, labels, values and errors.
   const labelCls = 'block text-xs font-semibold uppercase tracking-wider text-zinc-400'
-  const inputCls = 'mt-1.5 w-full rounded-lg border bg-panel px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30'
+  const inputCls = 'mt-1.5 w-full rounded-lg border bg-panel px-3.5 py-2.5 text-sm text-white placeholder-faint outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30'
+  // Wires each field error to its control for assistive tech.
+  const errorAttrs = (field, id) => (form.fieldErrors[field] ? `aria-invalid="true" aria-describedby="${id}-error"` : '')
   const isEdit = form.submitLabel !== 'Add member'
 %>
 
@@ -14,10 +16,10 @@
     <header class="flex items-start justify-between border-b border-line px-6 py-4">
       <div>
         <h2 id="member-form-title" class="font-display text-2xl tracking-wide text-white"><%= isEdit ? 'Edit member' : 'Add member' %></h2>
-        <p class="mt-0.5 text-xs text-zinc-500"><%= form.subtitle %></p>
+        <p class="mt-0.5 text-xs text-muted"><%= form.subtitle %></p>
       </div>
       <button type="button" data-close-modal aria-label="Close"
-              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </header>
@@ -32,49 +34,49 @@
       <div class="grid gap-4 sm:grid-cols-2">
         <div>
           <label for="mf-first" class="<%= labelCls %>">First name</label>
-          <input id="mf-first" name="first_name" value="<%= form.values.first_name %>" required placeholder="Juan"
-                 class="<%= inputCls %> <%= form.fieldErrors.first_name ? 'border-brand-600' : 'border-line' %>">
+          <input id="mf-first" name="first_name" value="<%= form.values.first_name %>" required maxlength="60" autocomplete="given-name" placeholder="Juan"
+                 class="<%= inputCls %> <%= form.fieldErrors.first_name ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('first_name', 'mf-first') %>>
           <% if (form.fieldErrors.first_name) { %>
-            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.first_name %></p>
+            <p id="mf-first-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.first_name %></p>
           <% } %>
         </div>
 
         <div>
           <label for="mf-last" class="<%= labelCls %>">Last name</label>
-          <input id="mf-last" name="last_name" value="<%= form.values.last_name %>" required placeholder="Dela Cruz"
-                 class="<%= inputCls %> <%= form.fieldErrors.last_name ? 'border-brand-600' : 'border-line' %>">
+          <input id="mf-last" name="last_name" value="<%= form.values.last_name %>" required maxlength="60" autocomplete="family-name" placeholder="Dela Cruz"
+                 class="<%= inputCls %> <%= form.fieldErrors.last_name ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('last_name', 'mf-last') %>>
           <% if (form.fieldErrors.last_name) { %>
-            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.last_name %></p>
+            <p id="mf-last-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.last_name %></p>
           <% } %>
         </div>
 
         <div class="sm:col-span-2">
           <label for="mf-email" class="<%= labelCls %>">Email</label>
-          <input id="mf-email" name="email" type="email" value="<%= form.values.email %>" required autocomplete="off" placeholder="juan@example.com"
-                 class="<%= inputCls %> <%= form.fieldErrors.email ? 'border-brand-600' : 'border-line' %>">
+          <input id="mf-email" name="email" type="email" value="<%= form.values.email %>" required maxlength="254" autocomplete="email" placeholder="juan@example.com"
+                 class="<%= inputCls %> <%= form.fieldErrors.email ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('email', 'mf-email') %>>
           <% if (form.fieldErrors.email) { %>
-            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.email %></p>
+            <p id="mf-email-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.email %></p>
           <% } %>
         </div>
 
         <div>
-          <label for="mf-phone" class="<%= labelCls %>">Phone <span class="normal-case text-zinc-600">optional</span></label>
-          <input id="mf-phone" name="phone" value="<%= form.values.phone %>" placeholder="0917 000 0000"
-                 class="<%= inputCls %> <%= form.fieldErrors.phone ? 'border-brand-600' : 'border-line' %>">
+          <label for="mf-phone" class="<%= labelCls %>">Phone <span class="normal-case text-faint">optional</span></label>
+          <input id="mf-phone" name="phone" value="<%= form.values.phone %>" maxlength="30" inputmode="tel" autocomplete="tel" placeholder="0917 000 0000"
+                 class="<%= inputCls %> <%= form.fieldErrors.phone ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('phone', 'mf-phone') %>>
           <% if (form.fieldErrors.phone) { %>
-            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.phone %></p>
+            <p id="mf-phone-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.phone %></p>
           <% } %>
         </div>
 
         <div>
           <label for="mf-gender" class="<%= labelCls %>">Gender</label>
-          <select id="mf-gender" name="gender" class="<%= inputCls %> <%= form.fieldErrors.gender ? 'border-brand-600' : 'border-line' %>">
+          <select id="mf-gender" name="gender" class="<%= inputCls %> <%= form.fieldErrors.gender ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('gender', 'mf-gender') %>>
             <% ['undisclosed', 'male', 'female', 'other'].forEach((g) => { %>
               <option value="<%= g %>" <%= form.values.gender === g ? 'selected' : '' %>><%= g.charAt(0).toUpperCase() + g.slice(1) %></option>
             <% }) %>
           </select>
           <% if (form.fieldErrors.gender) { %>
-            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.gender %></p>
+            <p id="mf-gender-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.gender %></p>
           <% } %>
         </div>
       </div>

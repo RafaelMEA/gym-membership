@@ -16,6 +16,35 @@ function visibleFocusable(container) {
   )
 }
 
+// Server-rendered pages use POST/Redirect/GET. Disable the submit control
+// once a POST starts so a double click at the counter can't record the
+// same payment, subscription or member twice. Native validation has
+// already passed by the time `submit` fires.
+document.querySelectorAll('form[method="post"]').forEach((form) => {
+  form.addEventListener('submit', () => {
+    if (form.dataset.submitting === 'true') return
+    form.dataset.submitting = 'true'
+    form.setAttribute('aria-busy', 'true')
+    form.querySelectorAll('button[type="submit"], input[type="submit"]').forEach((el) => {
+      el.dataset.submitDisabled = 'true'
+      el.disabled = true
+    })
+  })
+})
+
+// A restored page (back/forward cache) must not keep a disabled form.
+window.addEventListener('pageshow', (event) => {
+  if (!event.persisted) return
+  document.querySelectorAll('form[data-submitting]').forEach((form) => {
+    delete form.dataset.submitting
+    form.removeAttribute('aria-busy')
+    form.querySelectorAll('[data-submit-disabled]').forEach((el) => {
+      el.disabled = false
+      delete el.dataset.submitDisabled
+    })
+  })
+})
+
 function trapFocus(container, event) {
   const items = visibleFocusable(container)
   if (items.length === 0) {
@@ -184,6 +213,7 @@ function openModal(modal, opener) {
   const panel = modalPanel(modal)
   const first =
     panel.querySelector('[data-initial-focus]') ??
+    panel.querySelector('[aria-invalid="true"]') ??
     panel.querySelector('input:not([type=hidden]), select, textarea') ??
     visibleFocusable(panel)[0]
   if (first instanceof HTMLElement) first.focus()
@@ -250,7 +280,9 @@ document.querySelectorAll('[data-modal]').forEach((modal) => {
   if (modal.classList.contains('hidden')) return
   setBackgroundInert(modal, true)
   const panel = modalPanel(modal)
-  const first = panel.querySelector('input:not([type=hidden]), select, textarea')
+  const first =
+    panel.querySelector('[aria-invalid="true"]') ??
+    panel.querySelector('input:not([type=hidden]), select, textarea')
   if (first instanceof HTMLElement) first.focus()
 })
 syncScrollLock()
@@ -283,19 +315,27 @@ document.querySelectorAll('[data-toast]').forEach((toast) => {
 // Live search: enhances server-rendered GET forms. Filtering stays on
 // the server — we fetch the same page and swap the results region plus
 // any synced counters. Debounced, aborts stale requests, keeps focus in
-// the input, updates the URL, and falls back to a normal GET on errors.
+// the input, updates the URL, and shows an inline retry on network or
+// server errors. Without fetch/DOMParser the form stays a normal GET.
 function initLiveSearch(form) {
   const input = form.querySelector('input[name="q"]')
   const results = document.querySelector('[data-live-results]')
   if (!(input instanceof HTMLInputElement) || !(results instanceof HTMLElement)) return
+  if (typeof fetch !== 'function' || typeof DOMParser !== 'function') return
 
   const clearBtn = form.querySelector('[data-live-clear]')
   const submitBtn = form.querySelector('button[type="submit"]')
+  const errorBox = document.querySelector('[data-search-error]')
+  const retryBtn = document.querySelector('[data-search-retry]')
   let debounce = null
   let current = null
 
   const syncClear = () => {
     if (clearBtn) clearBtn.classList.toggle('hidden', input.value.trim() === '')
+  }
+
+  const setError = (show) => {
+    if (errorBox instanceof HTMLElement) errorBox.classList.toggle('hidden', !show)
   }
 
   const setBusy = (busy) => {
@@ -321,6 +361,7 @@ function initLiveSearch(form) {
     current = controller
     const url = buildUrl()
 
+    setError(false)
     setBusy(true)
     try {
       const response = await fetch(url, { signal: controller.signal })
@@ -343,13 +384,17 @@ function initLiveSearch(form) {
       setBusy(false)
     } catch (err) {
       if (err && err.name === 'AbortError') return
-      // Unsupported/failed request: let the normal form navigation handle it.
-      window.location.assign(url.toString())
+      // Keep the last good results on screen and offer a way to retry.
+      // Navigating away would replace a recoverable hiccup with a
+      // browser error page and lose the staff member's search.
+      setBusy(false)
+      setError(true)
     }
   }
 
   input.addEventListener('input', () => {
     syncClear()
+    setError(false)
     clearTimeout(debounce)
     debounce = setTimeout(run, 250)
   })
@@ -370,6 +415,8 @@ function initLiveSearch(form) {
       input.focus()
     })
   }
+
+  if (retryBtn instanceof HTMLElement) retryBtn.addEventListener('click', run)
 
   syncClear()
 }

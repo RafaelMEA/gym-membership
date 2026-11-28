@@ -32,14 +32,15 @@ export async function requirePageAuth(
     const payload = jwt.verify(token, env.JWT_SECRET)
     staffId = Number(payload.sub)
   } catch {
-    // expired / tampered token — start a fresh session
-    res.redirect('/login')
+    // expired / tampered token — start a fresh session, and say why
+    res.clearCookie('token')
+    res.redirect('/login?expired=1')
     return
   }
 
   if (!Number.isInteger(staffId) || staffId <= 0) {
     res.clearCookie('token')
-    res.redirect('/login')
+    res.redirect('/login?expired=1')
     return
   }
 
@@ -47,7 +48,7 @@ export async function requirePageAuth(
     const staff = await findById(staffId)
     if (!staff || !staff.is_active) {
       res.clearCookie('token')
-      res.redirect('/login')
+      res.redirect('/login?expired=1')
       return
     }
 
@@ -81,7 +82,8 @@ export function redirectIfAuthed(
     jwt.verify(token, env.JWT_SECRET)
     res.redirect('/')
   } catch {
-    // stale token — let them see the login form
+    // stale token — let them see the login form, not a dead cookie
+    res.clearCookie('token')
     next()
   }
 }

@@ -3,7 +3,10 @@
   //  1. record-payment modal (server-driven FormState)
   //  2. refund modal (static skeleton; JS sets the action + label)
   const labelCls = 'block text-xs font-semibold uppercase tracking-wider text-zinc-400'
-  const inputCls = 'mt-1.5 w-full rounded-lg border bg-panel px-3.5 py-2.5 text-sm text-white placeholder-zinc-600 outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30'
+  const inputCls = 'mt-1.5 w-full rounded-lg border bg-panel px-3.5 py-2.5 text-sm text-white placeholder-faint outline-none transition focus-visible:border-brand-600 focus-visible:ring-2 focus-visible:ring-brand-600/30'
+  // Wires each field error to its control for assistive tech.
+  const errorAttrs = (field, id) => (form.fieldErrors[field] ? `aria-invalid="true" aria-describedby="${id}-error"` : '')
+  const noSubscriptions = formOptions.subscriptions.length === 0
 %>
 
 <!-- Record payment -->
@@ -15,10 +18,10 @@
     <header class="flex items-start justify-between border-b border-line px-6 py-4">
       <div>
         <h2 id="payment-form-title" class="font-display text-2xl tracking-wide text-white">Record payment</h2>
-        <p class="mt-0.5 text-xs text-zinc-500"><%= form.subtitle %></p>
+        <p class="mt-0.5 text-xs text-muted"><%= form.subtitle %></p>
       </div>
       <button type="button" data-close-modal aria-label="Close"
-              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </header>
@@ -30,28 +33,35 @@
         </div>
       <% } %>
 
+      <% if (noSubscriptions) { %>
+        <div class="mb-4 rounded-lg border border-line bg-panel-2 px-4 py-3 text-xs leading-relaxed text-zinc-400" role="alert">
+          Add an active or frozen subscription before recording a payment. Create one from the
+          <a href="/subscriptions" class="text-brand-400 hover:text-brand-300">subscriptions page</a>.
+        </div>
+      <% } %>
+
       <div>
         <label for="pay-sub" class="<%= labelCls %>">Subscription</label>
         <select id="pay-sub" name="subscription_id" required
-                class="<%= inputCls %> <%= form.fieldErrors.subscription_id ? 'border-brand-600' : 'border-line' %>">
+                class="<%= inputCls %> <%= form.fieldErrors.subscription_id ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('subscription_id', 'pay-sub') %>>
           <option value="" <%= form.values.subscription_id === '' ? 'selected' : '' %> disabled>Select a subscription…</option>
           <% formOptions.subscriptions.forEach((s) => { %>
             <option value="<%= s.id %>" data-price="<%= s.price %>" <%= form.values.subscription_id === String(s.id) ? 'selected' : '' %>><%= s.label %></option>
           <% }) %>
         </select>
         <% if (form.fieldErrors.subscription_id) { %>
-          <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.subscription_id %></p>
+          <p id="pay-sub-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.subscription_id %></p>
         <% } %>
-        <p class="mt-1 text-xs text-zinc-600">Only active and frozen subscriptions are listed.</p>
+        <p class="mt-1 text-xs text-faint">Only active and frozen subscriptions are listed.</p>
       </div>
 
       <div class="mt-4 grid gap-4 sm:grid-cols-2">
         <div>
           <label for="pay-amount" class="<%= labelCls %>">Amount (₱)</label>
           <input id="pay-amount" name="amount" type="number" min="0.01" step="0.01" value="<%= form.values.amount %>" required placeholder="550.00"
-                 class="<%= inputCls %> <%= form.fieldErrors.amount ? 'border-brand-600' : 'border-line' %>">
+                 class="<%= inputCls %> <%= form.fieldErrors.amount ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('amount', 'pay-amount') %>>
           <% if (form.fieldErrors.amount) { %>
-            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.amount %></p>
+            <p id="pay-amount-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.amount %></p>
           <% } %>
         </div>
 
@@ -74,33 +84,33 @@
         </div>
 
         <div>
-          <label for="pay-date" class="<%= labelCls %>">Paid on <span class="normal-case text-zinc-600">optional</span></label>
+          <label for="pay-date" class="<%= labelCls %>">Paid on <span class="normal-case text-faint">optional</span></label>
           <input id="pay-date" name="paid_at" type="date" value="<%= form.values.paid_at %>"
-                 class="<%= inputCls %> <%= form.fieldErrors.paid_at ? 'border-brand-600' : 'border-line' %>">
+                 class="<%= inputCls %> <%= form.fieldErrors.paid_at ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('paid_at', 'pay-date') %>>
           <% if (form.fieldErrors.paid_at) { %>
-            <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.paid_at %></p>
+            <p id="pay-date-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.paid_at %></p>
           <% } %>
         </div>
       </div>
 
       <div class="mt-4">
-        <label for="pay-notes" class="<%= labelCls %>">Notes <span class="normal-case text-zinc-600">optional</span></label>
-        <textarea id="pay-notes" name="notes" rows="2" placeholder="e.g. renewal + 1 free session"
-                  class="<%= inputCls %> <%= form.fieldErrors.notes ? 'border-brand-600' : 'border-line' %>"><%= form.values.notes %></textarea>
+        <label for="pay-notes" class="<%= labelCls %>">Notes <span class="normal-case text-faint">optional</span></label>
+        <textarea id="pay-notes" name="notes" rows="2" maxlength="255" placeholder="e.g. renewal + 1 free session"
+                  class="<%= inputCls %> <%= form.fieldErrors.notes ? 'border-brand-600' : 'border-line' %>" <%- errorAttrs('notes', 'pay-notes') %>><%= form.values.notes %></textarea>
         <% if (form.fieldErrors.notes) { %>
-          <p class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.notes %></p>
+          <p id="pay-notes-error" class="mt-1 text-xs text-brand-400"><%= form.fieldErrors.notes %></p>
         <% } %>
       </div>
 
-      <p class="mt-3 text-[11px] leading-relaxed text-zinc-600">
+      <p class="mt-3 text-[11px] leading-relaxed text-faint">
         Leave the date blank to stamp it with the current database time. A non-paid status clears it.
       </p>
 
       <div class="mt-6 flex justify-end gap-2 border-t border-line pt-4">
         <button type="button" data-close-modal
                 class="btn btn-secondary">Cancel</button>
-        <button type="submit"
-                class="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500">
+        <button type="submit" <%= noSubscriptions ? 'disabled' : '' %>
+                class="rounded-lg bg-brand-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-500 disabled:cursor-not-allowed disabled:opacity-60">
           <%= form.submitLabel %>
         </button>
       </div>
@@ -117,10 +127,10 @@
     <header class="flex items-start justify-between border-b border-line px-6 py-4">
       <div>
         <h2 id="refund-form-title" class="font-display text-2xl tracking-wide text-white">Refund payment</h2>
-        <p class="mt-0.5 text-xs text-zinc-500">The payment stays on record, marked as refunded.</p>
+        <p class="mt-0.5 text-xs text-muted">The payment stays on record, marked as refunded.</p>
       </div>
       <button type="button" data-close-modal aria-label="Close"
-              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-zinc-500 transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-muted transition-colors hover:bg-panel-2 hover:text-zinc-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-600/50">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="h-5 w-5" aria-hidden="true" focusable="false"><path d="M6 6l12 12M18 6L6 18"/></svg>
       </button>
     </header>
@@ -129,8 +139,8 @@
       <p class="rounded-lg border border-line bg-panel-2 px-4 py-3 text-sm text-zinc-300" data-refund-label>—</p>
 
       <div class="mt-4">
-        <label for="refund-notes" class="<%= labelCls %>">Reason <span class="normal-case text-zinc-600">optional</span></label>
-        <textarea id="refund-notes" name="notes" rows="2" placeholder="Why is this being refunded?"
+        <label for="refund-notes" class="<%= labelCls %>">Reason <span class="normal-case text-faint">optional</span></label>
+        <textarea id="refund-notes" name="notes" rows="2" maxlength="255" placeholder="Why is this being refunded?"
                   class="<%= inputCls %> border-line"></textarea>
       </div>
 

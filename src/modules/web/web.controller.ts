@@ -6,7 +6,7 @@ import { env } from '../../config/env.js'
 import { daysBetween } from '../../lib/dates.js'
 import { renderPage, renderStandalone } from './render.js'
 import {
-  getToday, formatDate, formatTime, peso, flashToast,
+  getToday, formatDate, formatTime, peso, flashToast, str,
 } from './view.js'
 import * as memberRepo from '../members/member.repository.js'
 import * as planRepo from '../plans/plans.repository.js'
@@ -37,13 +37,20 @@ export async function showLogin(
     const toast =
       req.query.error === '1'
         ? { kind: 'error' as const, text: 'Incorrect email or password. Please try again.' }
-        : req.query.loggedout !== undefined
-          ? { kind: 'success' as const, text: 'Signed out successfully. See you next shift!' }
-          : null
+        : req.query.error === 'invalid'
+          ? { kind: 'error' as const, text: 'Enter a valid staff email and password.' }
+          : req.query.expired !== undefined
+            ? { kind: 'error' as const, text: 'Your session ended. Sign in again to continue.' }
+            : req.query.loggedout !== undefined
+              ? { kind: 'success' as const, text: 'Signed out successfully. See you next shift!' }
+              : null
 
     await renderStandalone(res, 'auth/login.ejs', {
       title: 'Sign in',
       toast,
+      // Keep what they typed after a failed attempt, but never reflect an
+      // unbounded query string into the form.
+      email: str(req.query, 'email').slice(0, 254),
     })
   } catch (err) {
     next(err)
@@ -64,8 +71,14 @@ export async function login(req: Request, res: Response, next: NextFunction) {
     res.cookie('token', token, COOKIE_OPTIONS)
     res.redirect('/?welcome=1')
   } catch (err) {
-    if (err instanceof AppError || err instanceof ZodError) {
-      res.redirect('/login?error=1')
+    if (err instanceof ZodError) {
+      res.redirect('/login?error=invalid')
+      return
+    }
+    if (err instanceof AppError) {
+      const email = str(req.body, 'email').trim().slice(0, 254)
+      const suffix = email === '' ? '' : `&email=${encodeURIComponent(email)}`
+      res.redirect(`/login?error=1${suffix}`)
       return
     }
     next(err)
